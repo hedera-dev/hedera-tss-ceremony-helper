@@ -1,0 +1,29 @@
+FROM eclipse-temurin:21.0.10_7-jdk-ubi9-minimal
+
+# ── metadata ────────────────────────────────────────────────────────────────
+LABEL org.opencontainers.image.title="hedera-tss-ceremony-helper" \
+      org.opencontainers.image.description="Hedera TSS Ceremony Helper" \
+      org.opencontainers.image.base.name="docker.io/library/eclipse-temurin:21.0.10_7-jdk-ubi9-minimal"
+
+# TARGETARCH is set automatically by Podman/BuildKit (e.g. amd64, arm64).
+ARG TARGETARCH
+
+# ── install tini (PID 1 / signal forwarding) ─────────────────────────────────
+# curl-minimal is pre-installed in ubi9-minimal; tini is fetched directly from GitHub.
+RUN curl -fsSL "https://github.com/krallin/tini/releases/download/v0.19.0/tini-${TARGETARCH}" \
+      -o /sbin/tini \
+ && chmod +x /sbin/tini
+
+# ── runtime user (non-root, UID 1000) ────────────────────────────────────────
+RUN groupadd --gid 1000 appgroup \
+ && useradd  --uid 1000 --gid appgroup --no-create-home appuser
+
+WORKDIR /app
+
+# ── entrypoint script ────────────────────────────────────────────────────────
+COPY --chown=appuser:appgroup entrypoint.sh entrypoint.sh
+RUN chmod +x entrypoint.sh
+
+USER appuser
+
+ENTRYPOINT ["/sbin/tini", "--", "/app/entrypoint.sh"]
