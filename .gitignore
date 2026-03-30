@@ -1,0 +1,16 @@
+.DS_Store
+.env
+
+keys/*
+!keys/.gitkeep
+
+logs/*
+!logs/.gitkeep
+
+tmp/*
+!tmp/.gitkeep
+
+temporary-notes.txt
+
+ceremony-test-jar/.gradle/
+ceremony-test-jar/build/

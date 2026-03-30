@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <marker id="arrowDown" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#555" />
+    </marker>
+    <marker id="arrowUp" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto">
+      <path d="M8,0 L0,3 L8,6 Z" fill="#555" />
+    </marker>
+    <linearGradient id="bucketGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4285F4" />
+      <stop offset="100%" stop-color="#2b5fc3" />
+    </linearGradient>
+    <linearGradient id="nodeGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff" />
+      <stop offset="100%" stop-color="#f0f0f0" />
+    </linearGradient>
+  </defs>
+
+  <!-- Title -->
+  <text x="400" y="32" text-anchor="middle" font-size="18" font-weight="bold" fill="#222">TSS Ceremony Process</text>
+
+  <!-- ==================== PARTICIPANTS (top) ==================== -->
+
+  <!-- Participant A -->
+  <rect x="40" y="60" width="200" height="160" rx="10" fill="url(#nodeGrad)" stroke="#888" stroke-width="1.5" />
+  <rect x="40" y="60" width="200" height="36" rx="10" fill="#7B1FA2" />
+  <rect x="40" y="84" width="200" height="12" fill="#7B1FA2" />
+  <text x="140" y="85" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">Participant A</text>
+  <text x="140" y="108" text-anchor="middle" font-size="11" fill="#444">Turn 1</text>
+  <text x="60" y="135" font-size="12" fill="#333">1. Poll bucket</text>
+  <text x="60" y="155" font-size="12" fill="#333">2. Download payload</text>
+  <text x="60" y="175" font-size="12" fill="#333">3. Compute + sign</text>
+  <text x="60" y="195" font-size="12" fill="#333">4. Upload result</text>
+
+  <!-- Participant B -->
+  <rect x="300" y="60" width="200" height="160" rx="10" fill="url(#nodeGrad)" stroke="#888" stroke-width="1.5" />
+  <rect x="300" y="60" width="200" height="36" rx="10" fill="#FBBC05" />
+  <rect x="300" y="84" width="200" height="12" fill="#FBBC05" />
+  <text x="400" y="85" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">Participant B</text>
+  <text x="400" y="108" text-anchor="middle" font-size="11" fill="#444">Turn 2</text>
+  <text x="320" y="135" font-size="12" fill="#333">1. Poll bucket</text>
+  <text x="320" y="155" font-size="12" fill="#333">2. Download payload</text>
+  <text x="320" y="175" font-size="12" fill="#333">3. Compute + sign</text>
+  <text x="320" y="195" font-size="12" fill="#333">4. Upload result</text>
+
+  <!-- Participant C -->
+  <rect x="560" y="60" width="200" height="160" rx="10" fill="url(#nodeGrad)" stroke="#888" stroke-width="1.5" />
+  <rect x="560" y="60" width="200" height="36" rx="10" fill="#EA4335" />
+  <rect x="560" y="84" width="200" height="12" fill="#EA4335" />
+  <text x="660" y="85" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">Participant C</text>
+  <text x="660" y="108" text-anchor="middle" font-size="11" fill="#444">Turn 3</text>
+  <text x="580" y="135" font-size="12" fill="#333">1. Poll bucket</text>
+  <text x="580" y="155" font-size="12" fill="#333">2. Download payload</text>
+  <text x="580" y="175" font-size="12" fill="#333">3. Compute + sign</text>
+  <text x="580" y="195" font-size="12" fill="#333">4. Upload result</text>
+
+  <!-- ==================== GCP BUCKET (bottom) ==================== -->
+
+  <rect x="225" y="300" width="350" height="80" rx="12" fill="url(#bucketGrad)" stroke="#1a4a9e" stroke-width="1.5" />
+  <text x="400" y="335" text-anchor="middle" font-size="15" font-weight="bold" fill="#fff">GCP Cloud Storage</text>
+  <text x="400" y="357" text-anchor="middle" font-size="12" fill="#d4e3ff">Shared Ceremony Bucket</text>
+
+  <!-- ==================== ARROWS: single line per participant ==================== -->
+
+  <!-- A <-> Bucket -->
+  <line x1="140" y1="220" x2="290" y2="300" stroke="#555" stroke-width="1.5" marker-start="url(#arrowUp)" marker-end="url(#arrowDown)" />
+
+  <!-- 2 <-> Bucket -->
+  <line x1="400" y1="220" x2="400" y2="300" stroke="#555" stroke-width="1.5" marker-start="url(#arrowUp)" marker-end="url(#arrowDown)" />
+
+  <!-- 3 <-> Bucket -->
+  <line x1="660" y1="220" x2="510" y2="300" stroke="#555" stroke-width="1.5" marker-start="url(#arrowUp)" marker-end="url(#arrowDown)" />
+
+  <!-- ==================== PHASE TIMELINE ==================== -->
+
+  <line x1="60" y1="430" x2="740" y2="430" stroke="#aaa" stroke-width="2" />
+
+  <rect x="60" y="415" width="120" height="30" rx="6" fill="#ddd" stroke="#aaa" stroke-width="1" />
+  <text x="120" y="435" text-anchor="middle" font-size="11" fill="#666">Phase 1</text>
+  <text x="120" y="465" text-anchor="middle" font-size="10" fill="#999">Coordinator</text>
+
+  <rect x="196" y="415" width="136" height="30" rx="6" fill="#34A853" stroke="#2d8f47" stroke-width="1" />
+  <text x="264" y="435" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">Phase 2</text>
+  <text x="264" y="465" text-anchor="middle" font-size="10" fill="#34A853">Participants</text>
+
+  <rect x="348" y="415" width="104" height="30" rx="6" fill="#ddd" stroke="#aaa" stroke-width="1" />
+  <text x="400" y="435" text-anchor="middle" font-size="11" fill="#666">Phase 3</text>
+  <text x="400" y="465" text-anchor="middle" font-size="10" fill="#999">Coordinator</text>
+
+  <rect x="468" y="415" width="136" height="30" rx="6" fill="#34A853" stroke="#2d8f47" stroke-width="1" />
+  <text x="536" y="435" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">Phase 4</text>
+  <text x="536" y="465" text-anchor="middle" font-size="10" fill="#34A853">Participants</text>
+
+  <rect x="620" y="415" width="120" height="30" rx="6" fill="#ddd" stroke="#aaa" stroke-width="1" />
+  <text x="680" y="435" text-anchor="middle" font-size="11" fill="#666">Phase 5</text>
+  <text x="680" y="465" text-anchor="middle" font-size="10" fill="#999">Coordinator</text>
+
+  <!-- Footer note -->
+  <text x="400" y="495" text-anchor="middle" font-size="11" font-style="italic" fill="#888">Participants never connect to each other or to the Hedera network — only to the shared bucket.</text>
+</svg>
