@@ -111,3 +111,17 @@ aws ec2 terminate-instances \
   --region "${AWS_REGION}" \
   --instance-ids <INSTANCE_ID>
 ```
+
+### Cleaning up after the ceremony
+
+Once the ceremony is complete, terminate the EC2 instance and delete all secrets
+from Secrets Manager:
+
+```sh
+export INSTANCE_ID="<your-instance-id>"   # optional — omit to only delete secrets
+./scripts/aws/clean-up-everything.sh
+```
+
+If `INSTANCE_ID` is set, the script terminates the EC2 instance (and its root
+volume). It then deletes all ceremony secrets from Secrets Manager. The script
+asks for confirmation before proceeding.

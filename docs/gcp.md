@@ -103,3 +103,16 @@ To delete the VM entirely:
 ```sh
 gcloud compute instances delete "hedera-tss-ceremony-${PARTICIPANT_ID}" --zone="${GCP_ZONE}"
 ```
+
+## Cleaning up after the ceremony
+
+Once the ceremony is complete, delete the GCE instance and all secrets from
+Secret Manager:
+
+```sh
+./scripts/gcp/clean-up-everything.sh
+```
+
+If the GCE instance still exists, the script deletes it (and its boot disk).
+It then deletes all ceremony secrets from Secret Manager. The script asks for
+confirmation before proceeding.

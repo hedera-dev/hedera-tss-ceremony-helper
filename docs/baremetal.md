@@ -66,3 +66,16 @@ Run `podman stop hedera-tss-ceremony`.
 The container uses
 [`tini`](https://github.com/krallin/tini) as PID 1, which forwards `SIGTERM`
 to the JVM for a graceful shutdown.
+
+## Cleaning up after the ceremony
+
+Once the ceremony is complete, remove the container and delete your private key
+and certificate files:
+
+```sh
+./scripts/baremetal/clean-up-everything.sh
+```
+
+This stops and removes the `hedera-tss-ceremony` container and deletes all
+`.pem` files from the `./keys/` directory. The script asks for confirmation
+before proceeding.
