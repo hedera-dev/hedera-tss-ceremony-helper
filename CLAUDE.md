@@ -39,7 +39,7 @@ export VARIANT="default"
 
 - **Java 21 application** (`ceremony-test-jar/`): Gradle project that builds a fat JAR validating S3 read/write permissions (28 operations) before the real ceremony. Main class: `com.hedera.ceremony.test.S3PermissionTest`.
 - **Container images** (`oci/`): Two variants — `default` (JRE 25, lightweight) and `legacy` (JDK 21). Both use tini as PID 1 and run as non-root (UID 1000). The ceremony JAR is downloaded at container startup via `JAR_URL` env var.
-- **Deployment scripts** (`scripts/`): Platform-specific automation for bare metal, GCP (Artifact Registry + Compute Engine), and AWS (EC2/Fargate). Each validates the environment before launching.
+- **Deployment scripts** (`scripts/`): Platform-specific automation for bare metal, GCP (Artifact Registry + Compute Engine), and AWS (EC2). Each validates the environment before launching.
 - **Key generation** (`scripts/key-and-certificate-generator.sh`): RSA 3072-bit keys + self-signed X.509 certs via OpenSSL. PARTICIPANT_ID range: 1000000001–1000000020. Files use PARTICIPANT_ID+1 naming (e.g., participant ID `1000000001` → `s-private-node1000000002.pem`).
 
 ## Key Design Decisions

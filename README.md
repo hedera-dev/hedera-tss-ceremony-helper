@@ -140,7 +140,7 @@ You can generate a private key and a 60-day self-signed certificate using the pr
 | --- | --- | --- |
 | Bare metal / VM (Linux or macOS) | [docs/baremetal.md](docs/baremetal.md) | Ready |
 | GCP Compute Engine | [docs/gcp.md](docs/gcp.md) | Ready |
-| AWS (EC2 and ECS/Fargate) | [docs/aws.md](docs/aws.md) | Under review |
+| AWS EC2 | [docs/aws.md](docs/aws.md) | Under review |
 | Cost comparison | [docs/cost-comparison.md](docs/cost-comparison.md) | Under review |
 
 ## Browser based access to the ceremony bucket

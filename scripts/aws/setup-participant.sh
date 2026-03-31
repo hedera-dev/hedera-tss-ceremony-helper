@@ -1,9 +1,8 @@
 #!/usr/bin/env sh
 # setup.sh — One-time AWS resource setup for the Hedera TSS Ceremony Helper.
 #
-# Run this script once before creating the EC2 instance or ECS Fargate service.
+# Run this script once before creating the EC2 instance.
 # It is idempotent and safe to run again if any step was previously completed.
-# This script covers both the EC2 and ECS Fargate deployment paths.
 #
 # Required environment variables (set once in your shell profile):
 #   AWS_REGION                 AWS region (e.g. us-east-1)
@@ -132,40 +131,8 @@ aws iam add-role-to-instance-profile \
   --role-name hedera-tss-role 2>/dev/null \
   || echo "   (role already attached to instance profile — skipping)"
 
-# ── Create IAM roles for ECS Fargate ─────────────────────────────────────────
-echo "==> Creating ECS Fargate IAM roles..."
-
-# Task execution role
-aws iam create-role \
-  --role-name hedera-tss-ecs-execution-role \
-  --assume-role-policy-document '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"ecs-tasks.amazonaws.com"},"Action":"sts:AssumeRole"}]}' \
-  --output text > /dev/null 2>&1 \
-  || echo "   (ECS execution role already exists — skipping)"
-
-aws iam attach-role-policy \
-  --role-name hedera-tss-ecs-execution-role \
-  --policy-arn arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
-
-aws iam put-role-policy \
-  --role-name hedera-tss-ecs-execution-role \
-  --policy-name tss-s3-secrets-access \
-  --policy-document "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":\"secretsmanager:GetSecretValue\",\"Resource\":[\"arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:tss-s3-access-key-*\",\"arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:tss-s3-secret-key-*\"]}]}"
-
-# Task role
-aws iam create-role \
-  --role-name hedera-tss-ecs-task-role \
-  --assume-role-policy-document '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"ecs-tasks.amazonaws.com"},"Action":"sts:AssumeRole"}]}' \
-  --output text > /dev/null 2>&1 \
-  || echo "   (ECS task role already exists — skipping)"
-
-aws iam put-role-policy \
-  --role-name hedera-tss-ecs-task-role \
-  --policy-name tss-key-secrets-access \
-  --policy-document "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":\"secretsmanager:GetSecretValue\",\"Resource\":[\"arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:tss-participant-private-key*\",\"arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:tss-participant-public-cert*\"]}]}"
-
 echo ""
 echo "==> AWS setup complete. You can now run the ceremony:"
 echo ""
-echo "    EC2:         ./scripts/aws/create-test-instance.sh"
-echo "    ECS Fargate: ./scripts/aws/run-test-fargate-task.sh"
+echo "    EC2: ./scripts/aws/create-test-instance.sh"
 echo ""
