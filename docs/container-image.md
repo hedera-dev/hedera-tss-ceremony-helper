@@ -14,14 +14,16 @@ The scripts running the ceremony use a container with the correct preconfigured 
 | 6 | `KEYS_PATH` | Path to participant keys inside the container (default: `/app/keys/`) |
 | 7 | `PASSWORD` | Key-loader password — use the literal string `password` |
 
-## Ceremony JAR URL (`JAR_URL`)
+## Ceremony JAR URL (`JAR_URL`) and hash verification (`JAR_HASH`)
 
 The container entrypoint downloads the ceremony JAR from a configurable URL at startup. The `JAR_URL` environment variable controls which JAR is downloaded:
 
 - **Default:** A test JAR from GitHub Releases that validates S3 read/write permissions.
 - **Override:** Set `JAR_URL` to point to a different JAR (e.g. the real `hedera-cryptography-ceremony` when it becomes available).
 
-The JAR is downloaded on every container start. When `JAR_URL` changes, restart the container to pick up the new JAR.
+The `JAR_HASH` environment variable is **required** and must contain the expected SHA-256 hash of the JAR. After downloading, the entrypoint computes the SHA-256 hash of the file and compares it against `JAR_HASH`. If they do not match, the container stops immediately with an error. This prevents executing a tampered or corrupted JAR.
+
+The JAR is downloaded on every container start. When `JAR_URL` changes, update `JAR_HASH` accordingly and restart the container.
 
 ## JDK 21 OCI image
 

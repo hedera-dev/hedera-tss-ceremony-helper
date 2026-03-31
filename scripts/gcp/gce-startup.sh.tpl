@@ -23,6 +23,7 @@ S3_REGION="<S3_REGION>"
 S3_ENDPOINT="<S3_ENDPOINT>"
 S3_BUCKET="<S3_BUCKET>"
 JAR_URL="<JAR_URL>"
+JAR_HASH="<JAR_HASH>"
 
 # COS does not ship gcloud. Derive project and token from the metadata server,
 # and use the Secret Manager REST API directly via curl + python3.
@@ -70,6 +71,7 @@ docker run -d \
   -e TSS_CEREMONY_S3_ACCESS_KEY="${ACCESS_KEY}" \
   -e TSS_CEREMONY_S3_SECRET_KEY="${SECRET_KEY}" \
   -e JAR_URL="${JAR_URL}" \
+  -e JAR_HASH="${JAR_HASH}" \
   -e RUST_BACKTRACE=full \
   -v /var/tss/keys:/app/keys:ro \
   -v /var/tss/logs:/app/logs \

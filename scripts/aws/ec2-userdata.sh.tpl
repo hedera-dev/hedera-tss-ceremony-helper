@@ -29,6 +29,7 @@ S3_BUCKET="<S3_BUCKET>"
 AWS_REGION="<AWS_REGION>"
 AWS_ACCOUNT_ID="<AWS_ACCOUNT_ID>"
 JAR_URL="<JAR_URL>"
+JAR_HASH="<JAR_HASH>"
 
 # ── Fetch S3 credentials from Secrets Manager ─────────────────────────────────
 ACCESS_KEY=$(aws secretsmanager get-secret-value \
@@ -69,6 +70,7 @@ docker run -d \
   -e TSS_CEREMONY_S3_ACCESS_KEY="${ACCESS_KEY}" \
   -e TSS_CEREMONY_S3_SECRET_KEY="${SECRET_KEY}" \
   -e JAR_URL="${JAR_URL}" \
+  -e JAR_HASH="${JAR_HASH}" \
   -e RUST_BACKTRACE=full \
   -v /var/tss/keys:/app/keys:ro \
   -v /var/tss/logs:/app/logs \

@@ -61,7 +61,7 @@ public class S3PermissionTest {
 
         System.out.println("=== Hedera TSS Ceremony - S3 Permission Test ===");
         System.out.println("Participant ID:  " + participantId);
-        System.out.println("Other Participants:  " + otherParticipantId);
+        System.out.println("Other participant:  " + otherParticipantId);
         System.out.println("S3 Bucket:   " + bucket);
         System.out.println("S3 Region:   " + region);
         System.out.println("S3 Endpoint: " + endpoint);

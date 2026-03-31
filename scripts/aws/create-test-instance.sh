@@ -29,11 +29,12 @@ AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 
 # ── Test ceremony parameters ──────────────────────────────────────────────────
 IMAGE="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/hedera-tss/hedera-tss-ceremony-helper:latest"
-PARTICIPANT_IDS="1,2,1000000001"
+PARTICIPANT_IDS="1000000001,1000000002,1000000003,1000000004,1000000005,1000000006,1000000007,1000000008,1000000009,1000000010,1000000011,1000000012,1000000013,1000000014,1000000015,1000000016,1000000017,1000000018,1000000019,1000000020"
 S3_REGION="us-east1"
 S3_ENDPOINT="https://storage.googleapis.com"
 S3_BUCKET="tss-ceremony-testnet"
 JAR_URL="${JAR_URL:-https://github.com/hedera-dev/hedera-tss-ceremony-helper/releases/download/test-jar/ceremony-s3-permission-test.jar}"
+: "${JAR_HASH:?JAR_HASH is required (expected SHA-256 hash of the JAR)}"
 
 # ── Render the user data template ─────────────────────────────────────────────
 TMPFILE="$(mktemp /tmp/ec2-userdata-XXXXXX.sh)"
@@ -49,6 +50,7 @@ sed \
   -e "s|<AWS_REGION>|${AWS_REGION}|g" \
   -e "s|<AWS_ACCOUNT_ID>|${AWS_ACCOUNT_ID}|g" \
   -e "s|<JAR_URL>|${JAR_URL}|g" \
+  -e "s|<JAR_HASH>|${JAR_HASH}|g" \
   "${SCRIPT_DIR}/ec2-userdata.sh.tpl" > "${TMPFILE}"
 
 # ── Resolve the latest Amazon Linux 2023 x86_64 AMI ──────────────────────────
