@@ -7,7 +7,7 @@
 # Required environment variables (set once in your shell profile):
 #   GCP_PROJECT_ID             GCP project ID
 #   GCP_REGION                 GCP region for Artifact Registry (e.g. us-central1)
-#   NODE_ID                    Your node ID (e.g. 1000000001)
+#   PARTICIPANT_ID             Your participant ID (e.g. 1000000001)
 #   TSS_CEREMONY_S3_ACCESS_KEY GCP S3 access key for the ceremony bucket
 #   TSS_CEREMONY_S3_SECRET_KEY GCP S3 secret key for the ceremony bucket
 #
@@ -21,11 +21,11 @@ cd "${REPO_ROOT}"
 # ── Environment ───────────────────────────────────────────────────────────────
 : "${GCP_PROJECT_ID:?GCP_PROJECT_ID is required}"
 : "${GCP_REGION:?GCP_REGION is required}"
-: "${NODE_ID:?NODE_ID is required}"
+: "${PARTICIPANT_ID:?PARTICIPANT_ID is required}"
 : "${TSS_CEREMONY_S3_ACCESS_KEY:?TSS_CEREMONY_S3_ACCESS_KEY is required}"
 : "${TSS_CEREMONY_S3_SECRET_KEY:?TSS_CEREMONY_S3_SECRET_KEY is required}"
 
-NODE_ID_PLUS_1=$((NODE_ID + 1))
+PARTICIPANT_ID_PLUS_1=$((PARTICIPANT_ID + 1))
 
 # ── Enable required APIs ───────────────────────────────────────────────────────
 echo "==> Enabling required GCP APIs..."
@@ -58,34 +58,34 @@ podman manifest push hedera-tss-ceremony-helper:latest "${IMAGE}"
 # ── Store S3 credentials in Secret Manager ────────────────────────────────────
 echo "==> Storing S3 credentials in Secret Manager..."
 printf '%s' "${TSS_CEREMONY_S3_ACCESS_KEY}" | \
-  gcloud secrets create "tss-s3-access-key-${NODE_ID}" \
+  gcloud secrets create "tss-s3-access-key-${PARTICIPANT_ID}" \
     --project="${GCP_PROJECT_ID}" --data-file=- 2>/dev/null \
   || printf '%s' "${TSS_CEREMONY_S3_ACCESS_KEY}" | \
-     gcloud secrets versions add "tss-s3-access-key-${NODE_ID}" \
+     gcloud secrets versions add "tss-s3-access-key-${PARTICIPANT_ID}" \
        --project="${GCP_PROJECT_ID}" --data-file=-
 
 printf '%s' "${TSS_CEREMONY_S3_SECRET_KEY}" | \
-  gcloud secrets create "tss-s3-secret-key-${NODE_ID}" \
+  gcloud secrets create "tss-s3-secret-key-${PARTICIPANT_ID}" \
     --project="${GCP_PROJECT_ID}" --data-file=- 2>/dev/null \
   || printf '%s' "${TSS_CEREMONY_S3_SECRET_KEY}" | \
-     gcloud secrets versions add "tss-s3-secret-key-${NODE_ID}" \
+     gcloud secrets versions add "tss-s3-secret-key-${PARTICIPANT_ID}" \
        --project="${GCP_PROJECT_ID}" --data-file=-
 
-# ── Store node key and certificate in Secret Manager ─────────────────────────
-echo "==> Storing node key and certificate in Secret Manager..."
-gcloud secrets create "tss-node-private-key-${NODE_ID}" \
+# ── Store participant key and certificate in Secret Manager ─────────────────────────
+echo "==> Storing participant key and certificate in Secret Manager..."
+gcloud secrets create "tss-participant-private-key-${PARTICIPANT_ID}" \
   --project="${GCP_PROJECT_ID}" \
-  --data-file="./keys/s-private-node${NODE_ID_PLUS_1}.pem" 2>/dev/null \
-  || gcloud secrets versions add "tss-node-private-key-${NODE_ID}" \
+  --data-file="./keys/s-private-node${PARTICIPANT_ID_PLUS_1}.pem" 2>/dev/null \
+  || gcloud secrets versions add "tss-participant-private-key-${PARTICIPANT_ID}" \
        --project="${GCP_PROJECT_ID}" \
-       --data-file="./keys/s-private-node${NODE_ID_PLUS_1}.pem"
+       --data-file="./keys/s-private-node${PARTICIPANT_ID_PLUS_1}.pem"
 
-gcloud secrets create "tss-node-public-cert-${NODE_ID}" \
+gcloud secrets create "tss-participant-public-cert-${PARTICIPANT_ID}" \
   --project="${GCP_PROJECT_ID}" \
-  --data-file="./keys/s-public-node${NODE_ID_PLUS_1}.pem" 2>/dev/null \
-  || gcloud secrets versions add "tss-node-public-cert-${NODE_ID}" \
+  --data-file="./keys/s-public-node${PARTICIPANT_ID_PLUS_1}.pem" 2>/dev/null \
+  || gcloud secrets versions add "tss-participant-public-cert-${PARTICIPANT_ID}" \
        --project="${GCP_PROJECT_ID}" \
-       --data-file="./keys/s-public-node${NODE_ID_PLUS_1}.pem"
+       --data-file="./keys/s-public-node${PARTICIPANT_ID_PLUS_1}.pem"
 
 # ── Create service account ────────────────────────────────────────────────────
 echo "==> Creating service account..."
@@ -98,7 +98,7 @@ SA_EMAIL="hedera-tss-sa@${GCP_PROJECT_ID}.iam.gserviceaccount.com"
 
 # ── Grant secret access to the service account ───────────────────────────────
 echo "==> Granting Secret Manager access to service account..."
-for SECRET in "tss-s3-access-key-${NODE_ID}" "tss-s3-secret-key-${NODE_ID}" "tss-node-private-key-${NODE_ID}" "tss-node-public-cert-${NODE_ID}"; do
+for SECRET in "tss-s3-access-key-${PARTICIPANT_ID}" "tss-s3-secret-key-${PARTICIPANT_ID}" "tss-participant-private-key-${PARTICIPANT_ID}" "tss-participant-public-cert-${PARTICIPANT_ID}"; do
   gcloud secrets add-iam-policy-binding "${SECRET}" \
     --project="${GCP_PROJECT_ID}" \
     --member="serviceAccount:${SA_EMAIL}" \

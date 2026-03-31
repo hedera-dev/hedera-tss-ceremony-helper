@@ -6,12 +6,12 @@ The scripts running the ceremony use a container with the correct preconfigured 
 
 | Position | Value | Description |
 | --- | --- | --- |
-| 1 | `NODE_ID` | This node's ID (integer, from `1000000001` to `1000000020`) — set via the `NODE_ID` environment variable |
-| 2 | `NODE_IDS` | Comma-separated list of **all** participating node IDs (no spaces; order must be identical on all nodes) |
+| 1 | `PARTICIPANT_ID` | This participant's ID (integer, from `1000000001` to `1000000020`) — set via the `PARTICIPANT_ID` environment variable |
+| 2 | `PARTICIPANT_IDS` | Comma-separated list of **all** participating participant IDs (no spaces; order must be identical on all participants) |
 | 3 | `REGION` | S3 bucket region (e.g. `us-east1`) |
 | 4 | `ENDPOINT` | S3 endpoint URL (e.g. `https://storage.googleapis.com`) |
 | 5 | `BUCKET` | S3 bucket name |
-| 6 | `KEYS_PATH` | Path to node keys inside the container (default: `/app/keys/`) |
+| 6 | `KEYS_PATH` | Path to participant keys inside the container (default: `/app/keys/`) |
 | 7 | `PASSWORD` | Key-loader password — use the literal string `password` |
 
 ## Ceremony JAR URL (`JAR_URL`)

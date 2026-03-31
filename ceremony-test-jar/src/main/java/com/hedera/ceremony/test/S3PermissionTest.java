@@ -30,11 +30,11 @@ public class S3PermissionTest {
 
     public static void main(String[] args) {
         if (args.length < 5) {
-            System.err.println("Usage: S3PermissionTest <NODE_ID> <NODE_IDS> <REGION> <ENDPOINT> <BUCKET> [KEYS_PATH] [PASSWORD]");
+            System.err.println("Usage: S3PermissionTest <PARTICIPANT_ID> <PARTICIPANT_IDS> <REGION> <ENDPOINT> <BUCKET> [KEYS_PATH] [PASSWORD]");
             System.err.println();
             System.err.println("Arguments:");
-            System.err.println("  NODE_ID    This node's ID (e.g. 1000000001)");
-            System.err.println("  NODE_IDS   Comma-separated list of all participating node IDs");
+            System.err.println("  PARTICIPANT_ID    This participant's ID (e.g. 1000000001)");
+            System.err.println("  PARTICIPANT_IDS   Comma-separated list of all participant IDs");
             System.err.println("  REGION     S3 bucket region (e.g. us-east1)");
             System.err.println("  ENDPOINT   S3 endpoint URL (e.g. https://storage.googleapis.com)");
             System.err.println("  BUCKET     S3 bucket name");
@@ -43,8 +43,8 @@ public class S3PermissionTest {
             System.exit(1);
         }
 
-        String nodeId = args[0];
-        String nodeIds = args[1];
+        String participantId = args[0];
+        String participantIds = args[1];
         String region = args[2];
         String endpoint = args[3];
         String bucket = args[4];
@@ -57,11 +57,11 @@ public class S3PermissionTest {
             System.exit(1);
         }
 
-        String otherNodeId = deriveOtherNodeId(nodeId, nodeIds);
+        String otherParticipantId = deriveOtherParticipantId(participantId, participantIds);
 
         System.out.println("=== Hedera TSS Ceremony - S3 Permission Test ===");
-        System.out.println("Node ID:     " + nodeId);
-        System.out.println("Other Node:  " + otherNodeId);
+        System.out.println("Participant ID:  " + participantId);
+        System.out.println("Other Participants:  " + otherParticipantId);
         System.out.println("S3 Bucket:   " + bucket);
         System.out.println("S3 Region:   " + region);
         System.out.println("S3 Endpoint: " + endpoint);
@@ -79,20 +79,20 @@ public class S3PermissionTest {
                 .build();
 
         // The 14 paths matching admin-verify-participant-access.sh exactly.
-        String p1  = "cycle0/phase2/" + nodeId + ".bin/chunk-0001.dat";
-        String p2  = "cycle0/phase2/" + nodeId + ".bin/chunk-0002.dat";
-        String p3  = "cycle0/phase2/" + nodeId + ".ready";
-        String p4  = "cycle0/phase2/" + nodeId + ".claimed";
-        String p5  = "cycle0/phase4/" + nodeId + ".bin/chunk-0001.dat";
-        String p6  = "cycle0/phase4/" + nodeId + ".ready";
-        String p7  = "cycle0/phase4/" + nodeId + ".claimed";
-        String p8  = "cycle99/phase2/" + nodeId + ".bin/chunk-0001.dat";
-        String p9  = "cycle0/phase2/" + nodeId + ".bin";
+        String p1  = "cycle0/phase2/" + participantId + ".bin/chunk-0001.dat";
+        String p2  = "cycle0/phase2/" + participantId + ".bin/chunk-0002.dat";
+        String p3  = "cycle0/phase2/" + participantId + ".ready";
+        String p4  = "cycle0/phase2/" + participantId + ".claimed";
+        String p5  = "cycle0/phase4/" + participantId + ".bin/chunk-0001.dat";
+        String p6  = "cycle0/phase4/" + participantId + ".ready";
+        String p7  = "cycle0/phase4/" + participantId + ".claimed";
+        String p8  = "cycle99/phase2/" + participantId + ".bin/chunk-0001.dat";
+        String p9  = "cycle0/phase2/" + participantId + ".bin";
         String p10 = "cycle0/phase2/initial.ready";
-        String p11 = "cycle0/phase2/" + otherNodeId + ".bin/chunk-0001.dat";
-        String p12 = "cycle0/phase2/" + otherNodeId + ".ready";
-        String p13 = "cycle0/phase3/" + nodeId + ".bin/chunk-0001.dat";
-        String p14 = "cycle100/phase2/" + nodeId + ".bin/chunk-0001.dat";
+        String p11 = "cycle0/phase2/" + otherParticipantId + ".bin/chunk-0001.dat";
+        String p12 = "cycle0/phase2/" + otherParticipantId + ".ready";
+        String p13 = "cycle0/phase3/" + participantId + ".bin/chunk-0001.dat";
+        String p14 = "cycle100/phase2/" + participantId + ".bin/chunk-0001.dat";
 
         // ── Read checks (14 total) ──
         System.out.println("--- Read checks (14 total) ---");
@@ -148,16 +148,16 @@ public class S3PermissionTest {
         }
     }
 
-    private static String deriveOtherNodeId(String nodeId, String nodeIds) {
-        String[] ids = nodeIds.split(",");
+    private static String deriveOtherParticipantId(String participantId, String participantIds) {
+        String[] ids = participantIds.split(",");
         for (String id : ids) {
             String trimmed = id.trim();
-            if (!trimmed.equals(nodeId)) {
+            if (!trimmed.equals(participantId)) {
                 return trimmed;
             }
         }
-        // Fallback: use a different node ID
-        return "1000000002".equals(nodeId) ? "1000000003" : "1000000002";
+        // Fallback: use a different participant ID
+        return "1000000002".equals(participantId) ? "1000000003" : "1000000002";
     }
 
     /**

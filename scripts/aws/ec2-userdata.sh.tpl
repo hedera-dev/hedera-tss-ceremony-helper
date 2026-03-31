@@ -9,7 +9,7 @@
 # to `aws ec2 run-instances` via --user-data automatically.
 #
 # The rendered script is executed on first boot of the EC2 instance: it installs
-# Docker, fetches S3 credentials and node key/certificate from AWS Secrets
+# Docker, fetches S3 credentials and participant key/certificate from AWS Secrets
 # Manager, then pulls and starts the ceremony container.
 #
 set -eu
@@ -19,10 +19,10 @@ dnf install -y docker
 systemctl enable --now docker
 
 # ── Variables ─────────────────────────────────────────────────────────────────
-NODE_ID=<NODE_ID>
-NODE_ID_PLUS_1=$((NODE_ID + 1))
+PARTICIPANT_ID=<PARTICIPANT_ID>
+PARTICIPANT_ID_PLUS_1=$((PARTICIPANT_ID + 1))
 IMAGE="<IMAGE>"
-NODE_IDS="<NODE_IDS>"
+PARTICIPANT_IDS="<PARTICIPANT_IDS>"
 S3_REGION="<S3_REGION>"
 S3_ENDPOINT="<S3_ENDPOINT>"
 S3_BUCKET="<S3_BUCKET>"
@@ -33,25 +33,25 @@ JAR_URL="<JAR_URL>"
 # ── Fetch S3 credentials from Secrets Manager ─────────────────────────────────
 ACCESS_KEY=$(aws secretsmanager get-secret-value \
   --region "${AWS_REGION}" \
-  --secret-id "tss-s3-access-key-${NODE_ID}" \
+  --secret-id "tss-s3-access-key-${PARTICIPANT_ID}" \
   --query SecretString --output text)
 SECRET_KEY=$(aws secretsmanager get-secret-value \
   --region "${AWS_REGION}" \
-  --secret-id "tss-s3-secret-key-${NODE_ID}" \
+  --secret-id "tss-s3-secret-key-${PARTICIPANT_ID}" \
   --query SecretString --output text)
 
-# ── Fetch node key and certificate from Secrets Manager ───────────────────────
+# ── Fetch participant key and certificate from Secrets Manager ───────────────────────
 mkdir -p /var/tss/keys
 aws secretsmanager get-secret-value \
   --region "${AWS_REGION}" \
-  --secret-id "tss-node-private-key-${NODE_ID}" \
+  --secret-id "tss-participant-private-key-${PARTICIPANT_ID}" \
   --query SecretString --output text \
-  > "/var/tss/keys/s-private-node${NODE_ID_PLUS_1}.pem"
+  > "/var/tss/keys/s-private-node${PARTICIPANT_ID_PLUS_1}.pem"
 aws secretsmanager get-secret-value \
   --region "${AWS_REGION}" \
-  --secret-id "tss-node-public-cert-${NODE_ID}" \
+  --secret-id "tss-participant-public-cert-${PARTICIPANT_ID}" \
   --query SecretString --output text \
-  > "/var/tss/keys/s-public-node${NODE_ID_PLUS_1}.pem"
+  > "/var/tss/keys/s-public-node${PARTICIPANT_ID_PLUS_1}.pem"
 chmod 600 /var/tss/keys/*.pem
 chown -R 1000:1000 /var/tss/keys
 
@@ -75,11 +75,11 @@ docker run -d \
   --log-driver=awslogs \
   --log-opt awslogs-region="${AWS_REGION}" \
   --log-opt awslogs-group=/hedera-tss-ceremony \
-  --log-opt awslogs-stream="node-${NODE_ID}" \
+  --log-opt awslogs-stream="participant-${PARTICIPANT_ID}" \
   --log-opt awslogs-create-group=true \
   "${IMAGE}" \
-  "${NODE_ID}" \
-  "${NODE_IDS}" \
+  "${PARTICIPANT_ID}" \
+  "${PARTICIPANT_IDS}" \
   "${S3_REGION}" \
   "${S3_ENDPOINT}" \
   "${S3_BUCKET}" \

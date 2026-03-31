@@ -20,7 +20,7 @@ from Secret Manager and starts the ceremony container automatically on each boot
 - The [Google Cloud SDK (`gcloud`)](https://cloud.google.com/sdk/docs/install) installed
   and authenticated (`gcloud auth login`).
 - A GCP project with billing enabled.
-- Your node key and certificate in `./keys/` (see [Private key and certificate](../README.md#private-key-and-certificate)).
+- Your participant key and certificate in `./keys/` (see [Private key and certificate](../README.md#private-key-and-certificate)).
 - Completed the [setup steps](../README.md#setup) in the main README (Podman installed, image built, credentials configured).
 
 Set the following environment parameters in addition to those defined in the [environment variables](../README.md#environment-variables) section:
@@ -31,12 +31,11 @@ export GCP_REGION="<your-region>"             # e.g. us-central1
 export GCP_ZONE="<your-zone>"                 # e.g. us-central1-a
 ```
 
-Then run the setup script once for each node you want to run.
 The script enables required APIs, creates the Artifact Registry repository, builds
-and pushes the container image, stores your credentials and node keys in Secret Manager and creates and configures a dedicated service account — all in a single step:
+and pushes the container image, stores your credentials and participant keys in Secret Manager and creates and configures a dedicated service account — all in a single step:
 
 ```sh
-./scripts/gcp/setup-node.sh
+./scripts/gcp/setup-participant.sh
 ```
 
 ## Create the GCE instance
@@ -69,7 +68,7 @@ single command — no manual editing required.
 To view recent container output directly:
 
 ```sh
-gcloud compute ssh "hedera-tss-ceremony-${NODE_ID}" --zone="${GCP_ZONE}" -- \
+gcloud compute ssh "hedera-tss-ceremony-${PARTICIPANT_ID}" --zone="${GCP_ZONE}" -- \
   'docker logs -t hedera-tss-ceremony'
 ```
 
@@ -77,7 +76,7 @@ Logs are also written to `/var/tss/logs/` on the VM. To follow the latest log
 file over SSH:
 
 ```sh
-gcloud compute ssh "hedera-tss-ceremony-${NODE_ID}" --zone="${GCP_ZONE}" -- \
+gcloud compute ssh "hedera-tss-ceremony-${PARTICIPANT_ID}" --zone="${GCP_ZONE}" -- \
   'tail -n +1 -f /var/tss/logs/$(ls -t /var/tss/logs/ | head -1)'
 ```
 
@@ -92,7 +91,7 @@ docker logs -t hedera-tss-ceremony
 To stop the container without deleting the VM:
 
 ```sh
-gcloud compute ssh "hedera-tss-ceremony-${NODE_ID}" --zone="${GCP_ZONE}" -- \
+gcloud compute ssh "hedera-tss-ceremony-${PARTICIPANT_ID}" --zone="${GCP_ZONE}" -- \
   'docker stop hedera-tss-ceremony'
 ```
 
@@ -102,5 +101,5 @@ To delete the VM entirely:
 > Ensure all logs have been saved before proceeding.
 
 ```sh
-gcloud compute instances delete "hedera-tss-ceremony-${NODE_ID}" --zone="${GCP_ZONE}"
+gcloud compute instances delete "hedera-tss-ceremony-${PARTICIPANT_ID}" --zone="${GCP_ZONE}"
 ```

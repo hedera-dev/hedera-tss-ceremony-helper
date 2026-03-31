@@ -25,7 +25,7 @@ automatically on first boot.
 - The [AWS CLI (`aws`)](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
   installed and configured (`aws configure`).
 - An AWS account with permissions to manage EC2, ECR, Secrets Manager, and IAM.
-- Your node key and certificate in `./keys/` (see [Private key and certificate](../README.md#private-key-and-certificate)).
+- Your participant key and certificate in `./keys/` (see [Private key and certificate](../README.md#private-key-and-certificate)).
 - Completed the [setup steps](../README.md#setup) in the main README (Podman installed, image built, credentials configured).
 
 Set the following environment parameters in addition to those defined in the [environment variables](../README.md#environment-variables) section:
@@ -35,12 +35,12 @@ export AWS_REGION="<your-region>"             # e.g. us-east-1
 ```
 
 Then run the setup script once. It creates the ECR repository, builds and pushes the
-container image, stores your credentials and node keys in Secrets Manager, creates the
+container image, stores your credentials and participant keys in Secrets Manager, creates the
 IAM role with least-privilege access, and configures both the EC2 instance profile and
 the ECS Fargate roles — all in a single step:
 
 ```sh
-./scripts/aws/setup-node.sh
+./scripts/aws/setup-participant.sh
 ```
 
 ### Create the EC2 instance
@@ -67,13 +67,13 @@ single command — no manual editing required.
 
 Container logs are forwarded automatically to **CloudWatch Logs** via the
 `awslogs` Docker driver, under the log group `/hedera-tss-ceremony` with one
-stream per node. To query them from the command line:
+stream per participant. To query them from the command line:
 
 ```sh
 aws logs get-log-events \
   --region "${AWS_REGION}" \
   --log-group-name /hedera-tss-ceremony \
-  --log-stream-name "node-${NODE_ID}" \
+  --log-stream-name "participant-${PARTICIPANT_ID}" \
   --output text
 ```
 
@@ -122,7 +122,7 @@ task on managed infrastructure, restarts it on failure via the ECS service
 desired-count mechanism, and forwards logs to CloudWatch Logs automatically.
 
 S3 credentials are injected as environment variables directly by ECS from
-Secrets Manager — no AWS CLI calls at runtime for those. Node key files are
+Secrets Manager — no AWS CLI calls at runtime for those. Participant key files are
 fetched from Secrets Manager by a lightweight init container at task startup
 and written to a shared ephemeral volume mounted into the main container.
 
@@ -131,7 +131,7 @@ and written to a shared ephemeral volume mounted into the main container.
 - The [AWS CLI (`aws`)](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
   installed and configured (`aws configure`).
 - An AWS account with permissions to manage EC2, ECR, Secrets Manager, and IAM.
-- Your node key and certificate in `./keys/` (see [Private key and certificate](../README.md#private-key-and-certificate)).
+- Your participant key and certificate in `./keys/` (see [Private key and certificate](../README.md#private-key-and-certificate)).
 
 Set the following environment parameters in addition to those defined in the [environment variables](../README.md#environment-variables) section:
 
@@ -143,10 +143,10 @@ The ECR repository, image, Secrets Manager secrets, and IAM roles are shared
 with the EC2 path. If you have not done so already, complete the AWS setup step:
 
 ```sh
-./scripts/aws/setup-node.sh
+./scripts/aws/setup-participant.sh
 ```
 
-> If you already ran `./scripts/aws/setup-node.sh` for the EC2 path, you can skip
+> If you already ran `./scripts/aws/setup-participant.sh` for the EC2 path, you can skip
 > this — all required resources are already in place.
 
 ### Run the ceremony
@@ -176,14 +176,14 @@ unexpectedly.
 ### Logs
 
 Container logs are forwarded automatically to **CloudWatch Logs** via the
-`awslogs` log driver, under the log group `/hedera-tss-ceremony`. Each node
-has its own stream prefixed with `node-<NODE_ID>`. To query them:
+`awslogs` log driver, under the log group `/hedera-tss-ceremony`. Each participant
+has its own stream prefixed with `participant-<PARTICIPANT_ID>`. To query them:
 
 ```sh
 aws logs get-log-events \
   --region "${AWS_REGION}" \
   --log-group-name /hedera-tss-ceremony \
-  --log-stream-name "node-${NODE_ID}/hedera-tss-ceremony/<TASK_ID>" \
+  --log-stream-name "participant-${PARTICIPANT_ID}/hedera-tss-ceremony/<TASK_ID>" \
   --output text
 ```
 
@@ -198,7 +198,7 @@ To stop the task without deleting the service (ECS will restart it per
 TASK_ARN=$(aws ecs list-tasks \
   --region "${AWS_REGION}" \
   --cluster hedera-tss \
-  --service-name "hedera-tss-ceremony-${NODE_ID}" \
+  --service-name "hedera-tss-ceremony-${PARTICIPANT_ID}" \
   --query 'taskArns[0]' --output text)
 
 aws ecs stop-task \
@@ -213,11 +213,11 @@ To stop permanently, scale the service to zero first, then delete it:
 aws ecs update-service \
   --region "${AWS_REGION}" \
   --cluster hedera-tss \
-  --service "hedera-tss-ceremony-${NODE_ID}" \
+  --service "hedera-tss-ceremony-${PARTICIPANT_ID}" \
   --desired-count 0
 
 aws ecs delete-service \
   --region "${AWS_REGION}" \
   --cluster hedera-tss \
-  --service "hedera-tss-ceremony-${NODE_ID}"
+  --service "hedera-tss-ceremony-${PARTICIPANT_ID}"
 ```

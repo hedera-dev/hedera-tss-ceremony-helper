@@ -1,15 +1,15 @@
 #!/bin/sh
 set -e
 
-# Check the node id is set and within the valid range.
-if [ -z "${NODE_ID:-}" ]; then
-  echo "Error: NODE_ID environment variable is not set."
-  echo "Example: export NODE_ID=1000000001"
+# Check the participant ID is set and within the valid range.
+if [ -z "${PARTICIPANT_ID:-}" ]; then
+  echo "Error: PARTICIPANT_ID environment variable is not set."
+  echo "Example: export PARTICIPANT_ID=1000000001"
   exit 1
 fi
 
-if [ "$NODE_ID" -lt 1000000001 ] || [ "$NODE_ID" -gt 1000000020 ]; then
-  echo "Error: NODE_ID must be between 1000000001 and 1000000020 (got: $NODE_ID)."
+if [ "$PARTICIPANT_ID" -lt 1000000001 ] || [ "$PARTICIPANT_ID" -gt 1000000020 ]; then
+  echo "Error: PARTICIPANT_ID must be between 1000000001 and 1000000020 (got: $PARTICIPANT_ID)."
   exit 1
 fi
 
@@ -23,11 +23,11 @@ fi
 # Checks keys are present.
 if [ ! -d "./keys" ] || [ -z "$(ls -A ./keys)" ]; then
   echo "Error: No keys found in ./keys directory."
-  echo "Please place the node's key and certificate files in the ./keys directory before running the ceremony."
+  echo "Please place the participant's key and certificate files in the ./keys directory before running the ceremony."
   exit 1
 fi
 
-# Create logs and per-node temp directories if they don't exist.
+# Create logs and temp directories if they don't exist.
 mkdir -p "$(pwd)/logs"
 mkdir -p "$(pwd)/tmp"
 
@@ -62,8 +62,8 @@ fi
 # Ensure the podman machine is synchronized with the host's date and time.
 podman machine ssh sudo date --set "$(date +'%Y-%m-%dT%H:%M:%S')"
 
-# Test ceremony parameters — NODE_IDS can be overridden via environment variable
-NODE_IDS="${NODE_IDS:-1,2,1000000001}"
+# Test ceremony parameters — PARTICIPANT_IDS can be overridden via environment variable
+PARTICIPANT_IDS="${PARTICIPANT_IDS:-1,2,1000000001}"
 
 CONTAINER_NAME="hedera-tss-ceremony"
 
@@ -73,7 +73,7 @@ if podman container exists "${CONTAINER_NAME}" 2>/dev/null; then
   podman rm -f "${CONTAINER_NAME}" > /dev/null
 fi
 
-echo "Running test ceremony with NODE_ID=${NODE_ID} and NODE_IDS=${NODE_IDS}"
+echo "Running test ceremony with PARTICIPANT_ID=${PARTICIPANT_ID} and PARTICIPANT_IDS=${PARTICIPANT_IDS}"
 
 # Run the container with the appropriate parameters for the test ceremony.
 # The container runs without memory or cpu limits, and the same must be true for the podman machine.
@@ -89,8 +89,8 @@ podman run -d \
   -v "$(pwd)/keys:/app/keys:ro" \
   -v "$(pwd)/tmp:/tmp" \
   hedera-tss-ceremony-helper:latest \
-  "${NODE_ID}" \
-  "${NODE_IDS}" \
+  "${PARTICIPANT_ID}" \
+  "${PARTICIPANT_IDS}" \
   us-east1 \
   https://storage.googleapis.com \
   tss-ceremony-testnet \
@@ -100,6 +100,5 @@ podman run -d \
 echo "Container ${CONTAINER_NAME} started. Following logs (CTRL+C to detach, container keeps running)..."
 echo "To stop the ceremony: podman stop ${CONTAINER_NAME}"
 
-# Follow this node's logs using podman logs instead of tailing the shared logs directory,
-# so that each terminal shows only its own node's output.
+# Follow the logs using podman logs instead of tailing the shared logs directory
 podman logs -f "${CONTAINER_NAME}" | while IFS= read -r line; do printf '[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$line"; done

@@ -8,7 +8,7 @@ The SRS is generated through a collaborative ceremony where a set of parties (up
 
 ## How does the ceremony work?
 
-The ceremony is **turn-based**: each participant acts when it is their turn. A single turn takes approximately 3 hours (with a 6-hour maximum timeout). All participants must remain **online for the entire ceremony window** (April 8 – May 12, 2026, ~40 days) because your turn can come at any time. Nodes communicate through a shared GCP Cloud Storage bucket (accessed via S3-compatible API).
+The ceremony is **turn-based**: each participant acts when it is their turn. A single turn takes approximately 3 hours (with a 6-hour maximum timeout). All participants must remain **online for the entire ceremony window** (April 8 – May 12, 2026, ~40 days) because your turn can come at any time. Participants communicate through a shared GCP Cloud Storage bucket (accessed via S3-compatible API).
 
 The output is the SRS plus a ceremony protocol transcript that allows public verification of the proceedings. After the ceremony, a public verification run confirms correctness, and participants must **destroy their private keys**.
 
@@ -22,7 +22,7 @@ bucket used to exchange data with other participants and the coordinator.
 
 In detail:
 
-1. Each participant is assigned a turn. Your node **polls the GCP bucket** waiting for its turn.
+1. Each participant is assigned a turn. Your machine **polls the GCP bucket** waiting for its turn.
 2. When it is your turn, the program **downloads the output produced by the previous participants**.
 3. It **applies its computation** on that payload, **signs the result**, and **uploads it** back to the bucket.
 4. The next participant picks it up and repeats the process.
@@ -40,4 +40,4 @@ This repository provides:
 
 - A **container image** (Podman/Docker) that downloads and runs the ceremony JAR automatically
 - **Deployment scripts** for three platforms: bare metal/VM, GCP Compute Engine, and AWS (under review)
-- **Key generation** tooling for the operator's node identity
+- **Key generation** tooling for the operator's participant IDentity

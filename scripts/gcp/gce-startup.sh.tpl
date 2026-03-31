@@ -9,16 +9,16 @@
 # to `gcloud compute instances create` automatically.
 #
 # The rendered script is executed on every boot of the GCE instance: it fetches
-# S3 credentials and node key/certificate from GCP Secret Manager, then pulls
+# S3 credentials and participant key/certificate from GCP Secret Manager, then pulls
 # and starts the ceremony container.
 #
 set -eu
 
 # ── Variables ─────────────────────────────────────────────────────────────────
-NODE_ID=<NODE_ID>
-NODE_ID_PLUS_1=$((NODE_ID + 1))
+PARTICIPANT_ID=<PARTICIPANT_ID>
+PARTICIPANT_ID_PLUS_1=$((PARTICIPANT_ID + 1))
 IMAGE="<IMAGE>"
-NODE_IDS="<NODE_IDS>"
+PARTICIPANT_IDS="<PARTICIPANT_IDS>"
 S3_REGION="<S3_REGION>"
 S3_ENDPOINT="<S3_ENDPOINT>"
 S3_BUCKET="<S3_BUCKET>"
@@ -42,13 +42,13 @@ get_secret() {
 }
 
 # ── Fetch S3 credentials from Secret Manager ──────────────────────────────────
-ACCESS_KEY=$(get_secret "tss-s3-access-key-${NODE_ID}")
-SECRET_KEY=$(get_secret "tss-s3-secret-key-${NODE_ID}")
+ACCESS_KEY=$(get_secret "tss-s3-access-key-${PARTICIPANT_ID}")
+SECRET_KEY=$(get_secret "tss-s3-secret-key-${PARTICIPANT_ID}")
 
-# ── Fetch node key and certificate from Secret Manager ────────────────────────
+# ── Fetch participant key and certificate from Secret Manager ────────────────────────
 mkdir -p /var/tss/keys
-get_secret "tss-node-private-key-${NODE_ID}" > "/var/tss/keys/s-private-node${NODE_ID_PLUS_1}.pem"
-get_secret "tss-node-public-cert-${NODE_ID}" > "/var/tss/keys/s-public-node${NODE_ID_PLUS_1}.pem"
+get_secret "tss-participant-private-key-${PARTICIPANT_ID}" > "/var/tss/keys/s-private-node${PARTICIPANT_ID_PLUS_1}.pem"
+get_secret "tss-participant-public-cert-${PARTICIPANT_ID}" > "/var/tss/keys/s-public-node${PARTICIPANT_ID_PLUS_1}.pem"
 chmod 600 /var/tss/keys/*.pem
 chown -R 1000:1000 /var/tss/keys
 
@@ -74,8 +74,8 @@ docker run -d \
   -v /var/tss/keys:/app/keys:ro \
   -v /var/tss/logs:/app/logs \
   "${IMAGE}" \
-  "${NODE_ID}" \
-  "${NODE_IDS}" \
+  "${PARTICIPANT_ID}" \
+  "${PARTICIPANT_IDS}" \
   "${S3_REGION}" \
   "${S3_ENDPOINT}" \
   "${S3_BUCKET}" \

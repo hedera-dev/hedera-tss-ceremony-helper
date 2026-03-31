@@ -7,7 +7,7 @@
 #
 # Required environment variables (set once in your shell profile):
 #   AWS_REGION                 AWS region (e.g. us-east-1)
-#   NODE_ID                    Your node ID (e.g. 1000000001)
+#   PARTICIPANT_ID             Your participant ID (e.g. 1000000001)
 #   TSS_CEREMONY_S3_ACCESS_KEY GCP S3 access key for the ceremony bucket
 #   TSS_CEREMONY_S3_SECRET_KEY GCP S3 secret key for the ceremony bucket
 #
@@ -20,11 +20,11 @@ cd "${REPO_ROOT}"
 
 # ── Environment ───────────────────────────────────────────────────────────────
 : "${AWS_REGION:?AWS_REGION is required}"
-: "${NODE_ID:?NODE_ID is required}"
+: "${PARTICIPANT_ID:?PARTICIPANT_ID is required}"
 : "${TSS_CEREMONY_S3_ACCESS_KEY:?TSS_CEREMONY_S3_ACCESS_KEY is required}"
 : "${TSS_CEREMONY_S3_SECRET_KEY:?TSS_CEREMONY_S3_SECRET_KEY is required}"
 
-NODE_ID_PLUS_1=$((NODE_ID + 1))
+PARTICIPANT_ID_PLUS_1=$((PARTICIPANT_ID + 1))
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 
 # ── Create ECR repository ─────────────────────────────────────────────────────
@@ -53,48 +53,48 @@ podman manifest push hedera-tss-ceremony-helper:latest "${IMAGE}"
 echo "==> Storing S3 credentials in Secrets Manager..."
 aws secretsmanager create-secret \
   --region "${AWS_REGION}" \
-  --name "tss-s3-access-key-${NODE_ID}" \
+  --name "tss-s3-access-key-${PARTICIPANT_ID}" \
   --secret-string "${TSS_CEREMONY_S3_ACCESS_KEY}" \
   --output text > /dev/null 2>&1 \
   || aws secretsmanager put-secret-value \
        --region "${AWS_REGION}" \
-       --secret-id "tss-s3-access-key-${NODE_ID}" \
+       --secret-id "tss-s3-access-key-${PARTICIPANT_ID}" \
        --secret-string "${TSS_CEREMONY_S3_ACCESS_KEY}" \
        --output text > /dev/null
 
 aws secretsmanager create-secret \
   --region "${AWS_REGION}" \
-  --name "tss-s3-secret-key-${NODE_ID}" \
+  --name "tss-s3-secret-key-${PARTICIPANT_ID}" \
   --secret-string "${TSS_CEREMONY_S3_SECRET_KEY}" \
   --output text > /dev/null 2>&1 \
   || aws secretsmanager put-secret-value \
        --region "${AWS_REGION}" \
-       --secret-id "tss-s3-secret-key-${NODE_ID}" \
+       --secret-id "tss-s3-secret-key-${PARTICIPANT_ID}" \
        --secret-string "${TSS_CEREMONY_S3_SECRET_KEY}" \
        --output text > /dev/null
 
-# ── Store node key and certificate in Secrets Manager ────────────────────────
-echo "==> Storing node key and certificate in Secrets Manager..."
+# ── Store participant key and certificate in Secrets Manager ────────────────────────
+echo "==> Storing participant key and certificate in Secrets Manager..."
 aws secretsmanager create-secret \
   --region "${AWS_REGION}" \
-  --name "tss-node-private-key-${NODE_ID}" \
-  --secret-string "file://./keys/s-private-node${NODE_ID_PLUS_1}.pem" \
+  --name "tss-participant-private-key-${PARTICIPANT_ID}" \
+  --secret-string "file://./keys/s-private-node${PARTICIPANT_ID_PLUS_1}.pem" \
   --output text > /dev/null 2>&1 \
   || aws secretsmanager put-secret-value \
        --region "${AWS_REGION}" \
-       --secret-id "tss-node-private-key-${NODE_ID}" \
-       --secret-string "file://./keys/s-private-node${NODE_ID_PLUS_1}.pem" \
+       --secret-id "tss-participant-private-key-${PARTICIPANT_ID}" \
+       --secret-string "file://./keys/s-private-node${PARTICIPANT_ID_PLUS_1}.pem" \
        --output text > /dev/null
 
 aws secretsmanager create-secret \
   --region "${AWS_REGION}" \
-  --name "tss-node-public-cert-${NODE_ID}" \
-  --secret-string "file://./keys/s-public-node${NODE_ID_PLUS_1}.pem" \
+  --name "tss-participant-public-cert-${PARTICIPANT_ID}" \
+  --secret-string "file://./keys/s-public-node${PARTICIPANT_ID_PLUS_1}.pem" \
   --output text > /dev/null 2>&1 \
   || aws secretsmanager put-secret-value \
        --region "${AWS_REGION}" \
-       --secret-id "tss-node-public-cert-${NODE_ID}" \
-       --secret-string "file://./keys/s-public-node${NODE_ID_PLUS_1}.pem" \
+       --secret-id "tss-participant-public-cert-${PARTICIPANT_ID}" \
+       --secret-string "file://./keys/s-public-node${PARTICIPANT_ID_PLUS_1}.pem" \
        --output text > /dev/null
 
 # ── Create IAM role and instance profile for EC2 ─────────────────────────────
@@ -108,7 +108,7 @@ aws iam create-role \
 aws iam put-role-policy \
   --role-name hedera-tss-role \
   --policy-name tss-secrets-access \
-  --policy-document "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":\"secretsmanager:GetSecretValue\",\"Resource\":[\"arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:tss-s3-access-key-*\",\"arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:tss-s3-secret-key-*\",\"arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:tss-node-private-key-*\",\"arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:tss-node-public-cert-*\"]}]}"
+  --policy-document "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":\"secretsmanager:GetSecretValue\",\"Resource\":[\"arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:tss-s3-access-key-*\",\"arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:tss-s3-secret-key-*\",\"arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:tss-participant-private-key-*\",\"arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:tss-participant-public-cert-*\"]}]}"
 
 aws iam attach-role-policy \
   --role-name hedera-tss-role \
@@ -161,7 +161,7 @@ aws iam create-role \
 aws iam put-role-policy \
   --role-name hedera-tss-ecs-task-role \
   --policy-name tss-key-secrets-access \
-  --policy-document "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":\"secretsmanager:GetSecretValue\",\"Resource\":[\"arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:tss-node-private-key*\",\"arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:tss-node-public-cert*\"]}]}"
+  --policy-document "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":\"secretsmanager:GetSecretValue\",\"Resource\":[\"arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:tss-participant-private-key*\",\"arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:tss-participant-public-cert*\"]}]}"
 
 echo ""
 echo "==> AWS setup complete. You can now run the ceremony:"

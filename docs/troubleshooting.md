@@ -9,13 +9,13 @@ Check the container logs for errors:
 podman logs hedera-tss-ceremony
 
 # GCP
-gcloud compute ssh "hedera-tss-ceremony-${NODE_ID}" --zone="${GCP_ZONE}" -- \
+gcloud compute ssh "hedera-tss-ceremony-${PARTICIPANT_ID}" --zone="${GCP_ZONE}" -- \
   'docker logs hedera-tss-ceremony'
 ```
 
 Common causes:
 
-- **Missing or incorrect key files** — verify the files in `./keys/` use the correct `NODE_ID+1` naming convention (e.g., `s-private-node1000000002.pem` for `NODE_ID=1000000001`). See the [key file naming reference](#key-file-naming-reference) below.
+- **Missing or incorrect key files** — verify the files in `./keys/` use the correct `PARTICIPANT_ID+1` naming convention (e.g., `s-private-node1000000002.pem` for `PARTICIPANT_ID=1000000001`). See the [key file naming reference](#key-file-naming-reference) below.
 - **Missing S3 credentials** — ensure `TSS_CEREMONY_S3_ACCESS_KEY` and `TSS_CEREMONY_S3_SECRET_KEY` are exported in your shell.
 - **Wrong key file permissions** — key files should be readable by UID 1000 (the container user). On cloud deployments, the scripts set `chmod 600` automatically.
 
@@ -56,7 +56,7 @@ needs to grant write permissions to your account on the ceremony bucket. Contact
 - Your GCP service account email or user email (shown in the error message)
 - The bucket name (e.g. `tss-ceremony-testnet` for test)
 
-> **Note:** If the node can read files (e.g. downloads parameters, finds `initial.ready`) but fails
+> **Note:** If the machine can read files (e.g. downloads parameters, finds `initial.ready`) but fails
 > on write, this is a permissions issue — not a credential or connectivity problem. Your HMAC keys
 > are correct; the bucket ACL just needs to be updated by the Hedera team.
 
@@ -76,7 +76,7 @@ The GCE startup script runs on every boot. If the container isn't running after 
 
 ```sh
 # SSH into the VM and check the startup script log
-gcloud compute ssh "hedera-tss-ceremony-${NODE_ID}" --zone="${GCP_ZONE}" -- \
+gcloud compute ssh "hedera-tss-ceremony-${PARTICIPANT_ID}" --zone="${GCP_ZONE}" -- \
   'sudo journalctl -u google-startup-scripts.service --no-pager -n 100'
 ```
 
@@ -124,9 +124,9 @@ podman machine start
 
 ## Key file naming reference
 
-The ceremony software uses `NODE_ID + 1` as the file index. If your files are named incorrectly, the container will fail at startup.
+The ceremony software uses `PARTICIPANT_ID + 1` as the file index. If your files are named incorrectly, the container will fail at startup.
 
-| `NODE_ID` | Private key file | Public certificate file |
+| `PARTICIPANT_ID` | Private key file | Public certificate file |
 | --- | --- | --- |
 | `1000000001` | `s-private-node1000000002.pem` | `s-public-node1000000002.pem` |
 | `1000000003` | `s-private-node1000000004.pem` | `s-public-node1000000004.pem` |

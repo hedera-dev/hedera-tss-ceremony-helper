@@ -5,22 +5,22 @@
 #   ./scripts/aws/run-test-fargate-task.sh
 #
 # Environment variables:
-#   AWS_REGION  AWS region (e.g. us-east-1)
-#   NODE_ID     Your node ID (e.g. 1000000001)
+#   AWS_REGION      AWS region (e.g. us-east-1)
+#   PARTICIPANT_ID  Your participant ID (e.g. 1000000001)
 #
 # Requirements:
 #   - AWS CLI authenticated via `aws configure` or environment variables.
-#   - Run ./scripts/aws/setup-node.sh once before using this script.
+#   - Run ./scripts/aws/setup-participant.sh once before using this script.
 #
 set -eu
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# ── Environment ── NODE_ID ────────────────────────────────────────────────────
-: "${NODE_ID:?NODE_ID is required (e.g. export NODE_ID=1000000001)}"
+# ── Environment ── PARTICIPANT_ID ────────────────────────────────────────────────────
+: "${PARTICIPANT_ID:?PARTICIPANT_ID is required (e.g. export PARTICIPANT_ID=1000000001)}"
 
-if [ "$NODE_ID" -lt 1000000001 ] || [ "$NODE_ID" -gt 1000000020 ]; then
-  echo "Error: NODE_ID must be between 1000000001 and 1000000020 (got: $NODE_ID)."
+if [ "$PARTICIPANT_ID" -lt 1000000001 ] || [ "$PARTICIPANT_ID" -gt 1000000020 ]; then
+  echo "Error: PARTICIPANT_ID must be between 1000000001 and 1000000020 (got: $PARTICIPANT_ID)."
   exit 1
 fi
 
@@ -29,9 +29,9 @@ fi
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 
 # ── Test ceremony parameters ──────────────────────────────────────────────────
-NODE_ID_PLUS_1=$((NODE_ID + 1))
+PARTICIPANT_ID_PLUS_1=$((PARTICIPANT_ID + 1))
 IMAGE="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/hedera-tss/hedera-tss-ceremony-helper:latest"
-NODE_IDS="1,2,1000000001"
+PARTICIPANT_IDS="1,2,1000000001"
 S3_REGION="us-east1"
 S3_ENDPOINT="https://storage.googleapis.com"
 S3_BUCKET="tss-ceremony-testnet"
@@ -42,10 +42,10 @@ TMPFILE="$(mktemp /tmp/ecs-task-definition-XXXXXX.json)"
 trap 'rm -f "${TMPFILE}"' EXIT
 
 sed \
-  -e "s|<NODE_ID>|${NODE_ID}|g" \
-  -e "s|<NODE_ID_PLUS_1>|${NODE_ID_PLUS_1}|g" \
+  -e "s|<PARTICIPANT_ID>|${PARTICIPANT_ID}|g" \
+  -e "s|<PARTICIPANT_ID_PLUS_1>|${PARTICIPANT_ID_PLUS_1}|g" \
   -e "s|<IMAGE>|${IMAGE}|g" \
-  -e "s|<NODE_IDS>|${NODE_IDS}|g" \
+  -e "s|<PARTICIPANT_IDS>|${PARTICIPANT_IDS}|g" \
   -e "s|<S3_REGION>|${S3_REGION}|g" \
   -e "s|<S3_ENDPOINT>|${S3_ENDPOINT}|g" \
   -e "s|<S3_BUCKET>|${S3_BUCKET}|g" \
@@ -105,7 +105,7 @@ fi
 SERVICE_STATUS=$(aws ecs describe-services \
   --region "${AWS_REGION}" \
   --cluster hedera-tss \
-  --services "hedera-tss-ceremony-${NODE_ID}" \
+  --services "hedera-tss-ceremony-${PARTICIPANT_ID}" \
   --query 'services[0].status' \
   --output text 2>/dev/null || echo "MISSING")
 
@@ -114,7 +114,7 @@ if [ "${SERVICE_STATUS}" = "ACTIVE" ]; then
   aws ecs update-service \
     --region "${AWS_REGION}" \
     --cluster hedera-tss \
-    --service "hedera-tss-ceremony-${NODE_ID}" \
+    --service "hedera-tss-ceremony-${PARTICIPANT_ID}" \
     --task-definition "${TASK_DEF_ARN}" \
     --force-new-deployment \
     --output table
@@ -123,7 +123,7 @@ else
   aws ecs create-service \
     --region "${AWS_REGION}" \
     --cluster hedera-tss \
-    --service-name "hedera-tss-ceremony-${NODE_ID}" \
+    --service-name "hedera-tss-ceremony-${PARTICIPANT_ID}" \
     --task-definition "${TASK_DEF_ARN}" \
     --desired-count 1 \
     --launch-type FARGATE \

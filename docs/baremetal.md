@@ -26,9 +26,9 @@
 ./scripts/baremetal/run-test-ceremony.sh
 ```
 
-> **What to expect:** Your node takes a turn during each phase. Processing takes ~1 hour per turn
+> **What to expect:** Your machine takes a turn during each phase. Processing takes ~1 hour per turn
 > on Apple Silicon (~2 hours on x86), plus upload time for ~6 GB of output. After completing
-> phase 2, your node will move to phase 4 and wait for `initial.ready`. In the test
+> phase 2, your machine will move to phase 4 and wait for `initial.ready`. In the test
 > environment (`tss-ceremony-testnet`), this is the expected end state — phase 4 requires a
 > coordinator action that is not part of the test setup. A successful phase 2 completion confirms
 > your entire setup is working correctly.

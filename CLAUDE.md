@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Hedera TSS Ceremony Helper — deployment and operations toolkit for running a TSS (Threshold Signature Scheme) cryptographic ceremony. Nodes coordinate via a GCP Cloud Storage bucket (S3-compatible API) in a turn-based protocol across a ~40-day window. This repo contains the container images, deployment scripts, and an S3 permission validation tool.
+Hedera TSS Ceremony Helper — deployment and operations toolkit for running a TSS (Threshold Signature Scheme) cryptographic ceremony. Machines coordinate via a GCP Cloud Storage bucket (S3-compatible API) in a turn-based protocol across a ~40-day window. This repo contains the container images, deployment scripts, and an S3 permission validation tool.
 
 ## Build Commands
 
@@ -28,7 +28,7 @@ cd ceremony-test-jar && ./gradlew build
 ## Run Test Ceremony
 
 ```bash
-export NODE_ID="1000000001"
+export PARTICIPANT_ID="1000000001"
 export TSS_CEREMONY_S3_ACCESS_KEY="<key>"
 export TSS_CEREMONY_S3_SECRET_KEY="<secret>"
 export VARIANT="default"
@@ -40,7 +40,7 @@ export VARIANT="default"
 - **Java 21 application** (`ceremony-test-jar/`): Gradle project that builds a fat JAR validating S3 read/write permissions (28 operations) before the real ceremony. Main class: `com.hedera.ceremony.test.S3PermissionTest`.
 - **Container images** (`oci/`): Two variants — `default` (JRE 25, lightweight) and `legacy` (JDK 21). Both use tini as PID 1 and run as non-root (UID 1000). The ceremony JAR is downloaded at container startup via `JAR_URL` env var.
 - **Deployment scripts** (`scripts/`): Platform-specific automation for bare metal, GCP (Artifact Registry + Compute Engine), and AWS (EC2/Fargate). Each validates the environment before launching.
-- **Key generation** (`scripts/key-and-certificate-generator.sh`): RSA 3072-bit keys + self-signed X.509 certs via OpenSSL. NODE_ID range: 1000000001–1000000020. Files use NODE_ID+1 naming (e.g., node `1000000001` → `s-private-node1000000002.pem`).
+- **Key generation** (`scripts/key-and-certificate-generator.sh`): RSA 3072-bit keys + self-signed X.509 certs via OpenSSL. PARTICIPANT_ID range: 1000000001–1000000020. Files use PARTICIPANT_ID+1 naming (e.g., participant ID `1000000001` → `s-private-node1000000002.pem`).
 
 ## Key Design Decisions
 
