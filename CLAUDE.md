@@ -42,9 +42,33 @@ export VARIANT="default"
 - **Deployment scripts** (`scripts/`): Platform-specific automation for bare metal, GCP (Artifact Registry + Compute Engine), and AWS (EC2). Each validates the environment before launching.
 - **Key generation** (`scripts/key-and-certificate-generator.sh`): RSA 3072-bit keys + self-signed X.509 certs via OpenSSL. PARTICIPANT_ID range: 1000000001–1000000020. Files use PARTICIPANT_ID+1 naming (e.g., participant ID `1000000001` → `s-private-node1000000002.pem`).
 
+## Deployment Script Structure
+
+Each cloud platform follows the same pattern:
+
+| Script | Purpose |
+| --- | --- |
+| `scripts/<platform>/setup-participant.sh` | One-time setup: registry, secrets, IAM/SA, roles |
+| `scripts/<platform>/create-test-instance.sh` | Launch a VM for the test ceremony |
+| `scripts/<platform>/create-instance.sh` | Launch a VM for the real ceremony (AWS: stub) |
+| `scripts/<platform>/clean-up-everything.sh` | Tear down VM + delete secrets after ceremony |
+
+Startup/userdata scripts are templates (`*.sh.tpl`) with `<PLACEHOLDER>` variables substituted by `sed` in the create scripts before being passed to the cloud API. Do not execute `.tpl` files directly.
+
+### AWS-specific
+
+- `scripts/aws/ec2-userdata.sh.tpl`: rendered and passed via `--user-data` to `aws ec2 run-instances`. Contains a `<RESTART_POLICY>` placeholder — `create-test-instance.sh` sets it to `no` (run once); the production script should use `unless-stopped`.
+- `aws ssm start-session` requires the **Session Manager plugin** (`brew install --cask session-manager-plugin` on macOS). All `docker` commands issued through SSM sessions must be prefixed with `sudo` (SSM runs as `ssm-user`, not root).
+- Secrets Manager stores 4 secrets per participant: `tss-s3-access-key-<ID>`, `tss-s3-secret-key-<ID>`, `tss-participant-private-key-<ID>`, `tss-participant-public-cert-<ID>`.
+
+### GCP-specific
+
+- `scripts/gcp/gce-startup.sh.tpl`: runs on **every boot** of the GCE instance (via startup script metadata). Fetches secrets via the Secret Manager REST API directly (no `gcloud` on COS) using the instance metadata server for auth.
+- GCP uses Container-Optimized OS; Docker is available but Podman is not.
+
 ## Key Design Decisions
 
-- **Podman over Docker** for rootless container operations
+- **Podman over Docker** for local/baremetal container operations; Docker is used on cloud VMs (Amazon Linux 2023, COS)
 - **Fat JAR** with all dependencies embedded for simplified deployment
 - **Environment-based configuration** — all credentials and settings via env vars, never in images
 - **Shell scripts use `set -eu`** — fail on errors and undefined variables

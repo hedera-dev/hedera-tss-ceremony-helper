@@ -93,9 +93,6 @@ Export the GCP credentials, your participant ID, and some additional variables i
 export TSS_CEREMONY_S3_ACCESS_KEY="<your-GCP-S3-access-key>"
 export TSS_CEREMONY_S3_SECRET_KEY="<your-GCP-S3-secret-key>"
 export PARTICIPANT_ID="<your-participant-id>"
-export VARIANT="default"
-export JAR_URL="https://github.com/hedera-dev/hedera-tss-ceremony-helper/releases/download/test-jar/ceremony-s3-permission-test.jar"
-export JAR_HASH="786e87f95d4f1d84550e377c0e47930388a3d96afd8b5f56a544b2efee2a650a"
 ```
 
 ### Build the container image

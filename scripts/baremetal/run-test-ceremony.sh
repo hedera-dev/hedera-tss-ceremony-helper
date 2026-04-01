@@ -62,16 +62,17 @@ fi
 # Ensure the podman machine is synchronized with the host's date and time.
 podman machine ssh sudo date --set "$(date +'%Y-%m-%dT%H:%M:%S')"
 
-# Test ceremony parameters — PARTICIPANT_IDS can be overridden via environment variable
-PARTICIPANT_IDS="${PARTICIPANT_IDS:-1000000001,1000000002,1000000003,1000000004,1000000005,1000000006,1000000007,1000000008,1000000009,1000000010,1000000011,1000000012,1000000013,1000000014,1000000015,1000000016,1000000017,1000000018,1000000019,1000000020}"
-
 CONTAINER_NAME="hedera-tss-ceremony"
-
 # Remove any existing container with the same name from a previous run.
 if podman container exists "${CONTAINER_NAME}" 2>/dev/null; then
   echo "Removing existing container '${CONTAINER_NAME}' from a previous run..."
   podman rm -f "${CONTAINER_NAME}" > /dev/null
 fi
+
+# Test ceremony parameters
+PARTICIPANT_IDS="${PARTICIPANT_IDS:-1000000001,1000000002,1000000003,1000000004,1000000005,1000000006,1000000007,1000000008,1000000009,1000000010,1000000011,1000000012,1000000013,1000000014,1000000015,1000000016,1000000017,1000000018,1000000019,1000000020}"
+JAR_URL="${JAR_URL:-https://github.com/hedera-dev/hedera-tss-ceremony-helper/releases/download/test-jar/ceremony-s3-permission-test.jar}"
+JAR_HASH="${JAR_HASH:-786e87f95d4f1d84550e377c0e47930388a3d96afd8b5f56a544b2efee2a650a}"
 
 echo "Running test ceremony with PARTICIPANT_ID=${PARTICIPANT_ID} and PARTICIPANT_IDS=${PARTICIPANT_IDS}"
 

@@ -28,15 +28,15 @@ fi
 : "${GCP_PROJECT_ID:?GCP_PROJECT_ID is required}"
 : "${GCP_REGION:?GCP_REGION is required}"
 : "${GCP_ZONE:?GCP_ZONE is required}"
-: "${JAR_HASH:?JAR_HASH is required (expected SHA-256 hash of the JAR)}"
+IMAGE="${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/hedera-tss/hedera-tss-ceremony-helper:latest"
 
 # ── Test ceremony parameters ──────────────────────────────────────────────────
-IMAGE="${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/hedera-tss/hedera-tss-ceremony-helper:latest"
 PARTICIPANT_IDS="1000000001,1000000002,1000000003,1000000004,1000000005,1000000006,1000000007,1000000008,1000000009,1000000010,1000000011,1000000012,1000000013,1000000014,1000000015,1000000016,1000000017,1000000018,1000000019,1000000020"
 S3_REGION="us-east1"
 S3_ENDPOINT="https://storage.googleapis.com"
 S3_BUCKET="tss-ceremony-testnet"
 JAR_URL="${JAR_URL:-https://github.com/hedera-dev/hedera-tss-ceremony-helper/releases/download/test-jar/ceremony-s3-permission-test.jar}"
+JAR_HASH="${JAR_HASH:-786e87f95d4f1d84550e377c0e47930388a3d96afd8b5f56a544b2efee2a650a}"
 
 # ── Check if instance already exists ─────────────────────────────────────────
 if gcloud compute instances describe hedera-tss-ceremony-${PARTICIPANT_ID} \

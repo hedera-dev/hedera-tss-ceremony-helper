@@ -26,15 +26,15 @@ fi
 # ── Environment ───────────────────────────────────────────────────────────────
 : "${AWS_REGION:?AWS_REGION is required}"
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+IMAGE="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/hedera-tss/hedera-tss-ceremony-helper:latest"
 
 # ── Test ceremony parameters ──────────────────────────────────────────────────
-IMAGE="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/hedera-tss/hedera-tss-ceremony-helper:latest"
-PARTICIPANT_IDS="1000000001,1000000002,1000000003,1000000004,1000000005,1000000006,1000000007,1000000008,1000000009,1000000010,1000000011,1000000012,1000000013,1000000014,1000000015,1000000016,1000000017,1000000018,1000000019,1000000020"
 S3_REGION="us-east1"
 S3_ENDPOINT="https://storage.googleapis.com"
 S3_BUCKET="tss-ceremony-testnet"
+PARTICIPANT_IDS="${PARTICIPANT_IDS:-1000000001,1000000002,1000000003,1000000004,1000000005,1000000006,1000000007,1000000008,1000000009,1000000010,1000000011,1000000012,1000000013,1000000014,1000000015,1000000016,1000000017,1000000018,1000000019,1000000020}"
 JAR_URL="${JAR_URL:-https://github.com/hedera-dev/hedera-tss-ceremony-helper/releases/download/test-jar/ceremony-s3-permission-test.jar}"
-: "${JAR_HASH:?JAR_HASH is required (expected SHA-256 hash of the JAR)}"
+JAR_HASH="${JAR_HASH:-786e87f95d4f1d84550e377c0e47930388a3d96afd8b5f56a544b2efee2a650a}"
 
 # ── Render the user data template ─────────────────────────────────────────────
 TMPFILE="$(mktemp /tmp/ec2-userdata-XXXXXX.sh)"
