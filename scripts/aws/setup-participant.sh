@@ -134,5 +134,5 @@ aws iam add-role-to-instance-profile \
 echo ""
 echo "==> AWS setup complete. You can now run the ceremony:"
 echo ""
-echo "    EC2: ./scripts/aws/create-test-instance.sh"
+echo "    ./scripts/aws/create-test-instance.sh"
 echo ""

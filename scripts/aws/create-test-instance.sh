@@ -51,6 +51,7 @@ sed \
   -e "s|<AWS_ACCOUNT_ID>|${AWS_ACCOUNT_ID}|g" \
   -e "s|<JAR_URL>|${JAR_URL}|g" \
   -e "s|<JAR_HASH>|${JAR_HASH}|g" \
+  -e "s|<RESTART_POLICY>|no|g" \
   "${SCRIPT_DIR}/ec2-userdata.sh.tpl" > "${TMPFILE}"
 
 # ── Resolve the latest Amazon Linux 2023 x86_64 AMI ──────────────────────────
@@ -65,8 +66,62 @@ AMI_ID=$(aws ec2 describe-images \
 
 echo "Using AMI: ${AMI_ID}"
 
+# ── Check for an existing instance ───────────────────────────────────────────
+EXISTING_ID=$(aws ec2 describe-instances \
+  --region "${AWS_REGION}" \
+  --filters \
+    "Name=tag:Name,Values=hedera-tss-ceremony-${PARTICIPANT_ID}" \
+    'Name=instance-state-name,Values=pending,running,stopping,stopped' \
+  --query 'Reservations[0].Instances[0].InstanceId' \
+  --output text)
+
+print_instance_info() {
+  echo "Instance ID: $1"
+  echo ""
+  echo "To view the logs, run the following command:"
+  echo ""
+  echo "  aws logs get-log-events \\"
+  echo "    --region \"${AWS_REGION}\" \\"
+  echo "    --log-group-name /hedera-tss-ceremony \\"
+  echo "    --log-stream-name \"participant-${PARTICIPANT_ID}\" \\"
+  echo "    --no-cli-pager"
+  echo ""
+  echo "Or check the logs in real-time via SSM Session Manager (no inbound ports required):"
+  echo ""
+  echo "  export INSTANCE_ID=$1"
+  echo "  aws ssm start-session \\"
+  echo "    --region \"${AWS_REGION}\" \\"
+  echo "    --target \"${INSTANCE_ID}\" \\"
+  echo "    --document-name AWS-StartInteractiveCommand \\"
+  echo "    --parameters 'command=[\"sudo docker logs -f hedera-tss-ceremony\"]'"
+}
+
+if [ "${EXISTING_ID}" != "None" ] && [ -n "${EXISTING_ID}" ]; then
+  echo "An instance for participant ${PARTICIPANT_ID} already exists: ${EXISTING_ID}"
+  printf "Terminate it and create a new one? [y/N] "
+  read -r ANSWER
+  case "${ANSWER}" in
+    y|Y)
+      echo "==> Terminating ${EXISTING_ID}..."
+      aws ec2 terminate-instances \
+        --region "${AWS_REGION}" \
+        --instance-ids "${EXISTING_ID}" \
+        --no-cli-pager > /dev/null
+      echo "    Waiting for termination..."
+      aws ec2 wait instance-terminated \
+        --region "${AWS_REGION}" \
+        --instance-ids "${EXISTING_ID}" \
+        --no-cli-pager
+      ;;
+    *)
+      print_instance_info "${EXISTING_ID}"
+      exit 0
+      ;;
+  esac
+fi
+
 # ── Create the EC2 instance ───────────────────────────────────────────────────
-aws ec2 run-instances \
+INSTANCE_ID=$(aws ec2 run-instances \
   --region "${AWS_REGION}" \
   --image-id "${AMI_ID}" \
   --instance-type m6i.xlarge \
@@ -74,4 +129,7 @@ aws ec2 run-instances \
   --block-device-mappings '[{"DeviceName":"/dev/xvda","Ebs":{"VolumeSize":60,"VolumeType":"gp3","DeleteOnTermination":true}}]' \
   --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=hedera-tss-ceremony-${PARTICIPANT_ID}}]" \
   --user-data "file://${TMPFILE}" \
-  --output table
+  --query 'Instances[0].InstanceId' \
+  --output text)
+
+print_instance_info "${INSTANCE_ID}"

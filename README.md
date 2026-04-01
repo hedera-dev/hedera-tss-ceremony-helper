@@ -135,12 +135,13 @@ You can generate a private key and a 60-day self-signed certificate using the pr
 
 ## Deploy and run the ceremony
 
-| Platform | Guide | Status |
-| --- | --- | --- |
-| Bare metal / VM (Linux or macOS) | [docs/baremetal.md](docs/baremetal.md) | Ready |
-| GCP Compute Engine | [docs/gcp.md](docs/gcp.md) | Ready |
-| AWS EC2 | [docs/aws.md](docs/aws.md) | Under review |
-| Cost comparison | [docs/cost-comparison.md](docs/cost-comparison.md) | Under review |
+| Platform | Guide |
+| --- | --- |
+| Bare metal / VM (Linux or macOS) | [docs/baremetal.md](docs/baremetal.md) |
+| GCP Compute Engine | [docs/gcp.md](docs/gcp.md) |
+| AWS EC2 | [docs/aws.md](docs/aws.md) |
+
+> **Note:** You can find more details about the costs of the cloud options in a dedicated [cost comparison document](docs/cost-comparison.md).
 
 ## Browser based access to the ceremony bucket
 

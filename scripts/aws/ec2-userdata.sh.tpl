@@ -66,7 +66,7 @@ aws ecr get-login-password --region "${AWS_REGION}" | \
 docker pull "${IMAGE}"
 docker run -d \
   --name hedera-tss-ceremony \
-  --restart=unless-stopped \
+  --restart=<RESTART_POLICY> \
   -e TSS_CEREMONY_S3_ACCESS_KEY="${ACCESS_KEY}" \
   -e TSS_CEREMONY_S3_SECRET_KEY="${SECRET_KEY}" \
   -e JAR_URL="${JAR_URL}" \

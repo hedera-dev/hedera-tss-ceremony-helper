@@ -72,6 +72,7 @@ sed \
   "${SCRIPT_DIR}/gce-startup.sh.tpl" > "${TMPFILE}"
 
 # ── Create the GCE instance ───────────────────────────────────────────────────
+echo "Creating GCE instance 'hedera-tss-ceremony-${PARTICIPANT_ID}' in project '${GCP_PROJECT_ID}', zone '${GCP_ZONE}'..."
 gcloud compute instances create hedera-tss-ceremony-${PARTICIPANT_ID} \
   --project="${GCP_PROJECT_ID}" \
   --machine-type=e2-standard-4 \
@@ -85,7 +86,7 @@ gcloud compute instances create hedera-tss-ceremony-${PARTICIPANT_ID} \
   --metadata-from-file="startup-script=${TMPFILE}"
 
 echo "Instance 'hedera-tss-ceremony-${PARTICIPANT_ID}' created successfully."
-echo "Follow the logs with:"
+echo "Wait a few moments for the instance to initialize, then follow the logs with:"
 echo ""
 echo "gcloud compute ssh \"hedera-tss-ceremony-\${PARTICIPANT_ID}\" --zone=\"\${GCP_ZONE}\" -- \\"
 echo "  'docker logs -t hedera-tss-ceremony'"
