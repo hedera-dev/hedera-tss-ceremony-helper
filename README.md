@@ -146,7 +146,7 @@ You can access the ceremony bucket in the Google Cloud Console at the following 
 
 ## Cleanup
 
-Although the private entropy being automatically destroyed by the ceremony code, **remember to clean up the keys and all the associated resources after the ceremony is over**. See each platform's guide for details.
+Although the private entropy is destroyed automatically by the ceremony code, **remember to clean up the keys and all the associated resources once the ceremony is over**. Refer to the specific platform's guide for details.
 
 ## Additional resources
 
