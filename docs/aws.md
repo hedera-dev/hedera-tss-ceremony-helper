@@ -43,7 +43,7 @@ automatically on first boot.
 ### Required IAM permissions for the operator
 
 Attach the following inline policy to the IAM user (or role) that runs `setup-participant.sh` and
-the `create-*-instance.sh` scripts. Replace `<AWS_ACCOUNT_ID>` with your account ID (e.g. `008049031881`).
+the `create-*-instance.sh` scripts. Replace `<AWS_ACCOUNT_ID>` with your account ID (e.g. `008049031900`).
 
 ```json
 {
