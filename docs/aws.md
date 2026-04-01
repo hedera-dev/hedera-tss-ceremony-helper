@@ -140,6 +140,8 @@ the `create-*-instance.sh` scripts. Replace `<AWS_ACCOUNT_ID>` with your account
 > **Note:** `ecr:GetAuthorizationToken` must have `Resource: "*"` — it is not a per-repository
 > action and cannot be scoped further.
 
+## Setup the participant
+
 Set the following environment parameters in addition to those defined in the [environment variables](../README.md#environment-variables) section:
 
 ```sh
@@ -220,8 +222,7 @@ aws ssm start-session \
 
 To terminate the instance entirely:
 
-> **Warning:** this permanently destroys the instance and its root volume.
-> Ensure all logs have been saved before proceeding.
+> **Warning:** this permanently destroys the instance and its root volume, logs included.
 
 ```sh
 aws ec2 terminate-instances \

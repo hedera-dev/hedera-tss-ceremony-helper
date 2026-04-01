@@ -97,8 +97,7 @@ gcloud compute ssh "hedera-tss-ceremony-${PARTICIPANT_ID}" --zone="${GCP_ZONE}" 
 
 To delete the VM entirely:
 
-> **Warning:** this permanently deletes the VM and all data on its boot disk.
-> Ensure all logs have been saved before proceeding.
+> **Warning:** this permanently deletes the VM and all data on its boot disk, logs included.
 
 ```sh
 gcloud compute instances delete "hedera-tss-ceremony-${PARTICIPANT_ID}" --zone="${GCP_ZONE}"
