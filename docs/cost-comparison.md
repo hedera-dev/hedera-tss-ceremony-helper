@@ -1,7 +1,5 @@
 # Cost comparison for cloud services
 
-**UNDER REVIEW** — AWS pricing and deployment paths may change.
-
 All estimates assume a **40-day ceremony window** (960 hours) with resources
 running continuously. Prices are on-demand rates in `us-east-1` / `us-central1`
 as of early 2026 — check the official pricing pages for the most current figures.
