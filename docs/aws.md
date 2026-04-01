@@ -1,9 +1,4 @@
-# Run on AWS (Amazon Web Services)
-
-**UNDER REVIEW** — the AWS EC2 deployment path is a draft and may be
-subject to changes. Please refer to the bare metal or the GCP guides if you want to follow a verified installation process.
-
-## Run on EC2
+# Run on AWS EC2 (Amazon Web Services)
 
 The recommended AWS approach is an **EC2 instance** running Amazon Linux 2023.
 Amazon Linux 2023 integrates natively with IAM roles and AWS CLI, so no manual
@@ -11,7 +6,7 @@ credential management is needed on the instance. A user data script fetches
 secrets and key files from Secrets Manager and starts the ceremony container
 automatically on first boot.
 
-### Machine type
+## Machine type
 
 | Bare-metal requirement | EC2 equivalent |
 | --- | --- |
@@ -20,7 +15,7 @@ automatically on first boot.
 | 60 GB SSD | 60 GB gp3 EBS root volume |
 | 1 Gbps network | Standard for all EC2 instances |
 
-### Prerequisites
+## Prerequisites
 
 - The [AWS CLI (`aws`)](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
   installed and configured (`aws configure`).
@@ -45,7 +40,7 @@ automatically on first boot.
 - Your participant key and certificate in `./keys/` (see [Private key and certificate](../README.md#private-key-and-certificate)).
 - Completed the [setup steps](../README.md#setup) in the main README (Podman installed, image built, credentials configured).
 
-#### Required IAM permissions for the operator
+### Required IAM permissions for the operator
 
 Attach the following inline policy to the IAM user (or role) that runs `setup-participant.sh` and
 the `create-*-instance.sh` scripts. Replace `<AWS_ACCOUNT_ID>` with your account ID (e.g. `008049031881`).
@@ -159,13 +154,13 @@ IAM role with least-privilege access and the EC2 instance profile — all in a s
 ./scripts/aws/setup-participant.sh
 ```
 
-### Create the EC2 instance
+## Create the EC2 instance
 
 The user data template is at `scripts/aws/ec2-userdata.sh.tpl`. The wrapper scripts below
 render the template with all ceremony parameters already set and create the instance in a
 single command — no manual editing required.
 
-#### Production run
+### Production run
 
 > **Note:** `scripts/aws/create-instance.sh` is currently a stub — production parameters are still to be defined. For now, use the test instance script described below.
 
@@ -173,7 +168,7 @@ single command — no manual editing required.
 ./scripts/aws/create-instance.sh
 ```
 
-#### Test run
+### Test run
 
 ```sh
 ./scripts/aws/create-test-instance.sh
@@ -185,7 +180,7 @@ The script prints the instance ID on completion. Export it for use in subsequent
 export INSTANCE_ID="<id printed by the script above>"
 ```
 
-### Logs
+## Logs
 
 Container logs are forwarded automatically to **CloudWatch Logs** via the
 `awslogs` Docker driver, under the log group `/hedera-tss-ceremony` with one
@@ -211,7 +206,7 @@ aws ssm start-session \
   --parameters 'command=["sudo docker logs -f hedera-tss-ceremony"]'
 ```
 
-### Stopping the ceremony
+## Stopping the ceremony
 
 To stop the container without terminating the instance:
 
@@ -235,7 +230,7 @@ aws ec2 terminate-instances \
   --no-cli-pager
 ```
 
-### Cleaning up after the ceremony
+## Cleaning up after the ceremony
 
 Once the ceremony is complete, terminate the EC2 instance and delete all secrets
 from Secrets Manager:
