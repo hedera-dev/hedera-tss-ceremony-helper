@@ -1,4 +1,4 @@
-FROM eclipse-temurin:25.0.2_10-jre-ubi10-minimal
+FROM docker.io/library/eclipse-temurin:25.0.2_10-jre-ubi10-minimal
 
 # ── metadata ────────────────────────────────────────────────────────────────
 LABEL org.opencontainers.image.title="hedera-tss-ceremony-helper" \
