@@ -95,7 +95,7 @@ podman run -d \
   "${PARTICIPANT_IDS}" \
   us-east1 \
   https://storage.googleapis.com \
-  tss-ceremony-testnet \
+  tss-ceremony-mainnet \
   /app/keys/ \
   password
 

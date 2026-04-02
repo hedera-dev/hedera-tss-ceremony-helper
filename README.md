@@ -142,7 +142,7 @@ You can generate a private key and a 60-day self-signed certificate using the pr
 
 ## Browser based access to the ceremony bucket
 
-You can access the ceremony bucket in the Google Cloud Console at the following URL: <https://console.cloud.google.com/storage/browser/tss-ceremony-testnet>
+You can access the ceremony bucket in the Google Cloud Console at the following URL: <https://console.cloud.google.com/storage/browser/tss-ceremony-mainnet>
 
 ## Cleanup
 

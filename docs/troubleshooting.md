@@ -54,7 +54,7 @@ This means your GCP account can **read** the bucket but cannot **write** to it. 
 needs to grant write permissions to your account on the ceremony bucket. Contact them with:
 
 - Your GCP service account email or user email (shown in the error message)
-- The bucket name (e.g. `tss-ceremony-testnet` for test)
+- The bucket name (e.g. `tss-ceremony-mainnet`)
 
 > **Note:** If the machine can read files (e.g. downloads parameters, finds `initial.ready`) but fails
 > on write, this is a permissions issue — not a credential or connectivity problem. Your HMAC keys
