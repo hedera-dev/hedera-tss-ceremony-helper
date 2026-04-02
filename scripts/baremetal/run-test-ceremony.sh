@@ -35,32 +35,36 @@ mkdir -p "$(pwd)/tmp"
 # To run the ceremony you need at least 16 GB of memory and 2 cpus (4 threads).
 REQUIRED_CPUS=$(nproc 2>/dev/null || sysctl -n hw.logicalcpu)
 REQUIRED_MEMORY=16384
-CURRENT_CPUS=$(podman machine inspect --format '{{.Resources.CPUs}}' 2>/dev/null || echo 0)
-CURRENT_MEMORY=$(podman machine inspect --format '{{.Resources.Memory}}' 2>/dev/null || echo 0)
-MACHINE_STATE=$(podman machine info --format '{{.Host.MachineState}}' 2>/dev/null || echo "Stopped")
 
-if [ "$MACHINE_STATE" != "Running" ]; then
-  podman machine set --cpus="${REQUIRED_CPUS}" --memory="${REQUIRED_MEMORY}"
-  podman machine start
-elif [ "$CURRENT_CPUS" -ne "$REQUIRED_CPUS" ] || [ "$CURRENT_MEMORY" -ne "$REQUIRED_MEMORY" ]; then
-  echo "Podman machine is configured with ${CURRENT_CPUS} CPUs and ${CURRENT_MEMORY} MB of memory."
-  echo "The ceremony requires ${REQUIRED_CPUS} CPUs and ${REQUIRED_MEMORY} MB of memory."
-  printf "Stop, reconfigure and restart the podman machine? [y/N] "
-  read -r REPLY
-  case "${REPLY}" in
-    [yY]|[yY][eE][sS])
-      podman machine stop
-      podman machine set --cpus="${REQUIRED_CPUS}" --memory="${REQUIRED_MEMORY}"
-      podman machine start
-      ;;
-    *)
-      echo "Continuing with current podman machine configuration."
-      ;;
-  esac
+# On macOS, podman runs inside a VM (podman machine); on Linux, podman runs natively.
+if [ "$(uname -s)" = "Darwin" ]; then
+  CURRENT_CPUS=$(podman machine inspect --format '{{.Resources.CPUs}}' 2>/dev/null || echo 0)
+  CURRENT_MEMORY=$(podman machine inspect --format '{{.Resources.Memory}}' 2>/dev/null || echo 0)
+  MACHINE_STATE=$(podman machine info --format '{{.Host.MachineState}}' 2>/dev/null || echo "Stopped")
+
+  if [ "$MACHINE_STATE" != "Running" ]; then
+    podman machine set --cpus="${REQUIRED_CPUS}" --memory="${REQUIRED_MEMORY}"
+    podman machine start
+  elif [ "$CURRENT_CPUS" -ne "$REQUIRED_CPUS" ] || [ "$CURRENT_MEMORY" -ne "$REQUIRED_MEMORY" ]; then
+    echo "Podman machine is configured with ${CURRENT_CPUS} CPUs and ${CURRENT_MEMORY} MB of memory."
+    echo "The ceremony requires ${REQUIRED_CPUS} CPUs and ${REQUIRED_MEMORY} MB of memory."
+    printf "Stop, reconfigure and restart the podman machine? [y/N] "
+    read -r REPLY
+    case "${REPLY}" in
+      [yY]|[yY][eE][sS])
+        podman machine stop
+        podman machine set --cpus="${REQUIRED_CPUS}" --memory="${REQUIRED_MEMORY}"
+        podman machine start
+        ;;
+      *)
+        echo "Continuing with current podman machine configuration."
+        ;;
+    esac
+  fi
+
+  # Ensure the podman machine is synchronized with the host's date and time.
+  podman machine ssh sudo date --set "$(date +'%Y-%m-%dT%H:%M:%S')"
 fi
-
-# Ensure the podman machine is synchronized with the host's date and time.
-podman machine ssh sudo date --set "$(date +'%Y-%m-%dT%H:%M:%S')"
 
 CONTAINER_NAME="hedera-tss-ceremony"
 # Remove any existing container with the same name from a previous run.
