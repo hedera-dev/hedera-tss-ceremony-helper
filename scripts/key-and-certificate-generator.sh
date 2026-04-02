@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -eu
 if [ "$#" -ne 1 ]; then
     echo "Error: Missing destination folder argument."
     echo "Usage: $0 <destinationFolder>"

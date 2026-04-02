@@ -57,13 +57,16 @@ chmod 600 /var/tss/keys/*.pem
 chown -R 1000:1000 /var/tss/keys
 
 # ── Authenticate to ECR and start the ceremony container ──────────────────────
+# Use a temporary Docker config dir so the token is never written to disk.
 mkdir -p /var/tss/logs
 chown 1000:1000 /var/tss/logs
+DOCKER_CONFIG=$(mktemp -d)
+trap 'rm -rf "${DOCKER_CONFIG}"' EXIT
 aws ecr get-login-password --region "${AWS_REGION}" | \
-  docker login --username AWS --password-stdin \
+  docker --config "${DOCKER_CONFIG}" login --username AWS --password-stdin \
   "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 
-docker pull "${IMAGE}"
+docker --config "${DOCKER_CONFIG}" pull "${IMAGE}"
 docker run -d \
   --name hedera-tss-ceremony \
   --restart=<RESTART_POLICY> \

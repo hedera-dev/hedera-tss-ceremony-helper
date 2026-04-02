@@ -9,10 +9,10 @@ Hedera TSS Ceremony Helper — deployment and operations toolkit for running a T
 ## Build Commands
 
 ```bash
-# Install prerequisites (Podman)
+# Install prerequisites (Podman; also installs qemu-user-static on Linux for cross-platform builds)
 ./scripts/install-requirements.sh
 
-# Build container image (default: JRE 25, multi-platform)
+# Build container image (default: JRE 25, multi-platform linux/amd64+arm64)
 ./scripts/build-oci-image.sh
 
 # Build legacy variant (JDK 21)
@@ -25,20 +25,21 @@ PLATFORMS=linux/amd64 ./scripts/build-oci-image.sh
 cd ceremony-test-jar && ./gradlew build
 ```
 
+On Linux, multi-platform builds require `qemu-user-static` for cross-arch emulation (handled by `install-requirements.sh`; on macOS the Podman VM provides this automatically).
+
 ## Run Test Ceremony
 
 ```bash
 export PARTICIPANT_ID="1000000001"
 export TSS_CEREMONY_S3_ACCESS_KEY="<key>"
 export TSS_CEREMONY_S3_SECRET_KEY="<secret>"
-export VARIANT="default"
 ./scripts/baremetal/run-test-ceremony.sh
 ```
 
 ## Architecture
 
 - **Java 21 application** (`ceremony-test-jar/`): Gradle project that builds a fat JAR validating S3 read/write permissions (28 operations) before the real ceremony. Main class: `com.hedera.ceremony.test.S3PermissionTest`.
-- **Container images** (`oci/`): Two variants — `default` (JRE 25, lightweight) and `legacy` (JDK 21). Both use tini as PID 1 and run as non-root (UID 1000). The ceremony JAR is downloaded at container startup via `JAR_URL` env var.
+- **Container images** (`oci/`): Two variants — `default` (JRE 25, lightweight) and `legacy` (JDK 21). Both use tini as PID 1 and run as non-root (UID 1000). `entrypoint.sh` downloads the JAR from `JAR_URL` on every start, verifies its SHA-256 against `JAR_HASH`, and aborts if they don't match.
 - **Deployment scripts** (`scripts/`): Platform-specific automation for bare metal, GCP (Artifact Registry + Compute Engine), and AWS (EC2). Each validates the environment before launching.
 - **Key generation** (`scripts/key-and-certificate-generator.sh`): RSA 3072-bit keys + self-signed X.509 certs via OpenSSL. PARTICIPANT_ID range: 1000000001–1000000020. Files use PARTICIPANT_ID+1 naming (e.g., participant ID `1000000001` → `s-private-node1000000002.pem`).
 
@@ -65,11 +66,12 @@ Startup/userdata scripts are templates (`*.sh.tpl`) with `<PLACEHOLDER>` variabl
 
 - `scripts/gcp/gce-startup.sh.tpl`: runs on **every boot** of the GCE instance (via startup script metadata). Fetches secrets via the Secret Manager REST API directly (no `gcloud` on COS) using the instance metadata server for auth.
 - GCP uses Container-Optimized OS; Docker is available but Podman is not.
+- The startup script uses a temporary Docker config directory (`mktemp -d` + `trap ... EXIT`) so the registry token is never persisted to disk. The AWS userdata script follows the same pattern.
 
 ## Key Design Decisions
 
 - **Podman over Docker** for local/baremetal container operations; Docker is used on cloud VMs (Amazon Linux 2023, COS)
 - **Fat JAR** with all dependencies embedded for simplified deployment
 - **Environment-based configuration** — all credentials and settings via env vars, never in images
-- **Shell scripts use `set -eu`** — fail on errors and undefined variables
+- **Shell scripts use `set -eu`** — fail on errors and undefined variables. Exception: stub scripts (`run-ceremony.sh`, `gcp/create-instance.sh`, `aws/create-instance.sh`) use only `set -e` since they contain no variable references.
 - **No CI/CD** — this is an operations tool tested manually via deployment scripts

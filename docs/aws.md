@@ -227,7 +227,7 @@ To terminate the instance entirely:
 ```sh
 aws ec2 terminate-instances \
   --region "${AWS_REGION}" \
-  --instance-ids ${INSTANCE_ID}
+  --instance-ids ${INSTANCE_ID} \
   --no-cli-pager
 ```
 

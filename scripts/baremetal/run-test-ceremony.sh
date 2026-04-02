@@ -1,5 +1,5 @@
 #!/bin/sh
-set -e
+set -eu
 
 # Check the participant ID is set and within the valid range.
 if [ -z "${PARTICIPANT_ID:-}" ]; then
