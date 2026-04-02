@@ -23,7 +23,7 @@ Common causes:
 
 The container downloads the ceremony JAR from a configurable URL (`JAR_URL`) on each fresh start. If this fails:
 
-```
+```sh
 curl: (6) Could not resolve host: github.com
 ```
 
@@ -34,7 +34,7 @@ curl: (6) Could not resolve host: github.com
 
 ## Container cannot reach the S3 bucket
 
-```
+```sh
 Unable to connect to endpoint https://storage.googleapis.com
 ```
 
@@ -44,7 +44,7 @@ Unable to connect to endpoint https://storage.googleapis.com
 
 ## Access denied (403) when writing to the bucket
 
-```
+```sh
 S3ResponseException: Failed to upload text file
 Response status code: 403
 Details: ... does not have storage.objects.create access ...
@@ -82,7 +82,7 @@ gcloud compute ssh "hedera-tss-ceremony-${PARTICIPANT_ID}" --zone="${GCP_ZONE}" 
 
 ## Cannot connect to Podman (macOS)
 
-```
+```sh
 Cannot connect to Podman. Please verify your connection to the Linux system using
 `podman system connection list`, or try `podman machine init` and `podman machine start`
 ```
