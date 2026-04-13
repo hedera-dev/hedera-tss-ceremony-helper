@@ -46,8 +46,6 @@ single command — no manual editing required.
 
 ### Production run
 
-> **Note:** `scripts/gcp/create-instance.sh` is currently a stub — production parameters are still to be defined. For now, use the test instance script described below.
-
 ```sh
 ./scripts/gcp/create-instance.sh
 ```

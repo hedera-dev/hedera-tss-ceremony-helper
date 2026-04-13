@@ -164,8 +164,6 @@ single command — no manual editing required.
 
 ### Production run
 
-> **Note:** `scripts/aws/create-instance.sh` is currently a stub — production parameters are still to be defined. For now, use the test instance script described below.
-
 ```sh
 ./scripts/aws/create-instance.sh
 ```

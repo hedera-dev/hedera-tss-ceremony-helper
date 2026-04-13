@@ -14,8 +14,6 @@
 
 ### Production run
 
-> **Note:** `scripts/baremetal/run-ceremony.sh` is currently a stub — production parameters are still to be defined. For now, you can run the test ceremony using `scripts/baremetal/run-test-ceremony.sh` as described in the next section.
-
 ```sh
 ./scripts/baremetal/run-ceremony.sh
 ```

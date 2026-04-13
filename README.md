@@ -2,10 +2,10 @@
 
 This repository contains a helper tool for the Hedera TSS Ceremony. It provides
 a containerised environment to run the ceremony software, including key management
-and logging. The container downloads the ceremony JAR at startup from a configurable
+and logging. The container downloads the [ceremony JAR](https://repo1.maven.org/maven2/com/hedera/cryptography/hedera-cryptography-ceremony/3.7.10/hedera-cryptography-ceremony-3.7.10-all.jar) at startup from a configurable
 URL.
 
-> **Ceremony window: April 8 – May 12, 2026.** Your machine must stay online for the entire window.
+> **Ceremony window: April 15 – May 12, 2026.** Your machine must stay online for the entire window.
 > See [Background](docs/background.md) for details on the turn-based protocol and responsibilities.
 
 ## How the ceremony works
