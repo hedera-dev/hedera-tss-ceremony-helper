@@ -10,8 +10,8 @@ from Secret Manager and starts the ceremony container automatically on each boot
 
 | Bare-metal requirement | GCE equivalent |
 | --- | --- |
-| 2 cores / 4 threads | `e2-standard-4` (4 vCPUs, 16 GB RAM) |
-| 16 GB RAM | Included in `e2-standard-4` |
+| 4 cores / 8 threads | `e2-standard-8` (8 vCPUs, 32 GB RAM) |
+| 16 GB RAM | Included in `e2-standard-8` |
 | 60 GB SSD | 60 GB SSD persistent disk (boot disk) |
 | 1 Gbps network | Standard for all GCE VMs |
 

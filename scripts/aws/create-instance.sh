@@ -124,7 +124,7 @@ fi
 INSTANCE_ID=$(aws ec2 run-instances \
   --region "${AWS_REGION}" \
   --image-id "${AMI_ID}" \
-  --instance-type m6i.xlarge \
+  --instance-type m6i.2xlarge \
   --iam-instance-profile Name=hedera-tss-instance-profile \
   --block-device-mappings '[{"DeviceName":"/dev/xvda","Ebs":{"VolumeSize":60,"VolumeType":"gp3","DeleteOnTermination":true}}]' \
   --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=hedera-tss-ceremony-${PARTICIPANT_ID}}]" \

@@ -75,7 +75,7 @@ sed \
 echo "Creating GCE instance 'hedera-tss-ceremony-${PARTICIPANT_ID}' in project '${GCP_PROJECT_ID}', zone '${GCP_ZONE}'..."
 gcloud compute instances create hedera-tss-ceremony-${PARTICIPANT_ID} \
   --project="${GCP_PROJECT_ID}" \
-  --machine-type=e2-standard-4 \
+  --machine-type=e2-standard-8 \
   --zone="${GCP_ZONE}" \
   --image-family=cos-stable \
   --image-project=cos-cloud \

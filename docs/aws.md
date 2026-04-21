@@ -10,8 +10,8 @@ automatically on first boot.
 
 | Bare-metal requirement | EC2 equivalent |
 | --- | --- |
-| 2 cores / 4 threads | `m6i.xlarge` (4 vCPUs, 16 GB RAM) |
-| 16 GB RAM | Included in `m6i.xlarge` |
+| 4 cores / 8 threads | `m6i.2xlarge` (8 vCPUs, 32 GB RAM) |
+| 16 GB RAM | Included in `m6i.2xlarge` |
 | 60 GB SSD | 60 GB gp3 EBS root volume |
 | 1 Gbps network | Standard for all EC2 instances |
 

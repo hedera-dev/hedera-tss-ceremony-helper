@@ -32,7 +32,7 @@ mkdir -p "$(pwd)/logs"
 mkdir -p "$(pwd)/tmp"
 
 # Ensure the podman machine is running and configured with all host CPUs and 16 GB of memory.
-# To run the ceremony you need at least 16 GB of memory and 2 cpus (4 threads).
+# To run the ceremony you need at least 16 GB of memory and 4 cores (8 threads).
 REQUIRED_CPUS=$(nproc 2>/dev/null || sysctl -n hw.logicalcpu)
 REQUIRED_MEMORY=16384
 

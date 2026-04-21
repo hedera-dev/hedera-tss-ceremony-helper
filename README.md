@@ -31,7 +31,7 @@ For more details about what the TSS ceremony is, how it works, and what this rep
 
 ## Hardware requirements
 
-- CPU: 2 cores (4 threads)
+- CPU: 4 cores (8 threads)
 - RAM: 16 GB
 - Storage: 60 GB SSD
 - Network: 1 Gbps
